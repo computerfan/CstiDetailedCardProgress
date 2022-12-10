@@ -5,8 +5,7 @@ This mod shows card status and progress related details in tooltip.
 ![Preview](pic/screenshot1.png)
 
 # Usage
-
-## Settings
+## Settings (Optional)
 
 The configuration file can be found at /BepInEx/config/CstiDetailedCardProgress.cfg
 
@@ -14,6 +13,8 @@ The configuration file can be found at /BepInEx/config/CstiDetailedCardProgress.
 |--|--|--|
 |Enabled|true|If set to true, will show the details tooltips|
 |HotKey|F2|The key to enable and disable the tool tips|
+
+__Toggle Note__: When using the hotkey to enable/disable the detailed tooltips, the tooltips will not be updated until the user moves the mouse off of a card.
 
 ## Install BepInEx
 
