@@ -2,16 +2,26 @@
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using static CstiDetailedCardProgress.Utils;
 
 namespace CstiDetailedCardProgress
 {
     class Stat
     {
+
         [HarmonyPostfix, HarmonyPatch(typeof(StatStatusGraphics), "Update")]
-        public static void StatStatusGraphicsPatch(StatStatusGraphics __instance)
+        public static void StatStatusGraphicsPatch(StatStatusGraphics __instance, TooltipText ___MyTooltip)
         {
-            __instance.SetTooltip(__instance.Title, $"{(string.IsNullOrWhiteSpace(__instance.ModelStatus.Description) ? "" : $"{__instance.ModelStatus.Description}\n")}{FormatInGameStat(__instance.ModelStatus.ParentStat)}", "");
+            if (Plugin.Enabled)
+            {
+                __instance.SetTooltip(__instance.Title, $"{(string.IsNullOrWhiteSpace(__instance.ModelStatus.Description) ? "" : $"{__instance.ModelStatus.Description}\n")}{FormatInGameStat(__instance.ModelStatus.ParentStat)}", "");
+            }
+            else
+            {
+                //Reset the tool tip to the base game settings.
+                __instance.SetTooltip(__instance.ModelStatus.GameName, __instance.ModelStatus.Description, "");
+            }
         }
         public static string FormatInGameStat(InGameStat stat)
         {

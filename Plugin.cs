@@ -1,7 +1,10 @@
 ﻿using BepInEx;
+using BepInEx.Configuration;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using UnityEngine;
 using static CstiDetailedCardProgress.Utils;
 
 
@@ -12,19 +15,36 @@ namespace CstiDetailedCardProgress
     {
         public static TooltipText MyTooltip = new();
         public static InGameStat inGamePlayerWeight;
+        public static bool Enabled;
+        public static KeyCode HotKey;
+
         private void Awake()
         {
+            Enabled = Config.Bind("General", nameof(Enabled), true, "If true, will show the tool tips.").Value;
+            HotKey = Config.Bind("General", nameof(HotKey), KeyCode.F2, "The key to enable and disable the tool tips").Value;
+
             // Plugin startup logic
             Harmony.CreateAndPatchAll(typeof(Plugin));
             Harmony.CreateAndPatchAll(typeof(Stat));
+
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
 
 
+
+        [HarmonyPostfix, HarmonyPatch(typeof(GameManager), "Update")]
+        public static void GameMangerUpdatePatch()
+        {
+            if (Input.GetKeyDown(HotKey))
+            {
+                Enabled = !Enabled;
+            }
+        }
+
         [HarmonyPrefix, HarmonyPatch(typeof(InGameCardBase), "OnHoverEnter")]
         public static void OnHoverEnterPatch(InGameCardBase __instance)
         {
-            if (!(bool)GameManager.DraggedCard)
+            if (Enabled && !(bool)GameManager.DraggedCard )
             {
                 CardData CardModel = __instance.CardModel;
                 GraphicsManager GraphicsM = Traverse.Create(__instance).Field("GraphicsM").GetValue<GraphicsManager>();
@@ -388,13 +408,22 @@ namespace CstiDetailedCardProgress
         [HarmonyPostfix, HarmonyPatch(typeof(EquipmentButton), "Update")]
         public static void EquipmentButtonUpdatePatch(EquipmentButton __instance)
         {
-            if (inGamePlayerWeight == null)
+            if (!Enabled)
             {
-                inGamePlayerWeight = MBSingleton<GameManager>.Instance.InGamePlayerWeight;
-            } else if(!(bool)GameManager.DraggedCard)
-            {
-                __instance.SetTooltip(__instance.Title, FormatBasicEntry($"{inGamePlayerWeight.SimpleCurrentValue}/{inGamePlayerWeight.StatModel.MinMaxValue.y}", "Weight"), null);
+                __instance.SetTooltip(LocalizedString.Equipment, null, null);
             }
+            else
+            {
+                if (inGamePlayerWeight == null)
+                {
+                    inGamePlayerWeight = MBSingleton<GameManager>.Instance.InGamePlayerWeight;
+                }
+                else if (!(bool)GameManager.DraggedCard)
+                {
+                    __instance.SetTooltip(__instance.Title, FormatBasicEntry($"{inGamePlayerWeight.SimpleCurrentValue}/{inGamePlayerWeight.StatModel.MinMaxValue.y}", "Weight"), null);
+                }
+            }
+
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(EquipmentButton), "OnDisable")]
