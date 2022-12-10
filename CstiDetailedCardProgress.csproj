@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
     <AssemblyName>CstiDetailedCardProgress</AssemblyName>
     <Description>CSTI Detailed Card Progress Mod</Description>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <PackageId>space.cfan.CstiDetailedCardProgress</PackageId>
@@ -12,6 +12,7 @@
     <Copyright>MIT License</Copyright>
     <Product>CSTI Detailed Card Progress Mod</Product>
     <Company />
+	<GameAssemblyPath Condition="'$(GameAssemblyPath)' == ''">..\..\Card Survival - Tropical Island_Data\Managed</GameAssemblyPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,32 +21,32 @@
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
 	<PackageReference Include="UnityEngine.Modules" Version="2019.4.35" IncludeAssets="compile" />
   </ItemGroup>
-  
+
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
   </ItemGroup>
   
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\Card Survival - Tropical Island_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>$(GameAssemblyPath)\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>..\..\Card Survival - Tropical Island_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+      <HintPath>$(GameAssemblyPath)\Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\Card Survival - Tropical Island_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>$(GameAssemblyPath)\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>..\..\Card Survival - Tropical Island_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+      <HintPath>$(GameAssemblyPath)\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\Card Survival - Tropical Island_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>$(GameAssemblyPath)\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>..\..\Card Survival - Tropical Island_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>$(GameAssemblyPath)\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\Card Survival - Tropical Island_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>$(GameAssemblyPath)\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
