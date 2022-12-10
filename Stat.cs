@@ -3,6 +3,7 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
 using static CstiDetailedCardProgress.Utils;
 
 namespace CstiDetailedCardProgress
@@ -57,6 +58,22 @@ namespace CstiDetailedCardProgress
             if (rateModsTexts.Count > 0)
             {
                 texts.Add(rateModsTexts.Join(delimiter: "\n"));
+            }
+            if (stat.StatModel.UsesNovelty && stat.StalenessValues.Count > 0)
+            {
+                List<string> stalenessText = new();
+                stat.StalenessValues.ForEach(staleness =>
+                {
+                    if (staleness.Quantity > 0 && stat.StatModel.StalenessMultiplier != 0)
+                    {
+                        stalenessText.Add(FormatBasicEntry($"{ Mathf.Pow(stat.StatModel.StalenessMultiplier, staleness.Quantity):G3}", $"(est. {stat.StatModel.NoveltyCooldownDuration - gm.CurrentTickInfo.z + staleness.LastTick + Math.Max(0, staleness.Quantity - 1) * stat.StatModel.NoveltyCooldownDuration}t) {staleness.ModifierSource}", indent: 2));
+                    }
+                });
+                if (stalenessText.Count > 0)
+                {
+                    texts.Add(FormatBasicEntry("Action Staleness", $"(*{1 / stat.StatModel.StalenessMultiplier:0.##}/{stat.StatModel.NoveltyCooldownDuration}t)"));
+                    texts.Add(stalenessText.Join(delimiter: "\n"));
+                }
             }
             return $"<size=75%>{texts.Join(delimiter: "\n")}</size>";
         }
