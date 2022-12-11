@@ -4,6 +4,7 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using UnityEngine;
 using static CstiDetailedCardProgress.Utils;
 
@@ -162,9 +163,13 @@ namespace CstiDetailedCardProgress
                         }
                     }
 
+                    CookingRecipe changeRecipe = GetRecipeStateChange(__instance);
+                    CardStateChange? recipeStateChange = changeRecipe?.IngredientChanges;
+
                     if (CardModel.SpoilageTime && CardModel.SpoilageTime.Show(__instance.ContainedLiquid, __instance.CurrentSpoilage))
                     {
-                        texts.Add(FormatProgressAndRate(__instance.CurrentSpoilage, (CardModel.SpoilageTime.MaxValue == 0 ? CardModel.SpoilageTime.FloatValue : CardModel.SpoilageTime.MaxValue), (string.IsNullOrEmpty(CardModel.SpoilageTime.CardStatName) ? "Spoilage" : __instance.CardModel.SpoilageTime.CardStatName), __instance.CurrentSpoilageRate));
+                        texts.Add(FormatProgressAndRate(__instance.CurrentSpoilage, (CardModel.SpoilageTime.MaxValue == 0 ? CardModel.SpoilageTime.FloatValue 
+                            :CardModel.SpoilageTime.MaxValue), (string.IsNullOrEmpty(CardModel.SpoilageTime.CardStatName) ? "Spoilage" : __instance.CardModel.SpoilageTime.CardStatName), __instance.CurrentSpoilageRate + (recipeStateChange?.SpoilageChange.x ?? 0)));
                         if(CardModel.SpoilageTime.RatePerDaytimePoint != 0){texts.Add(FormatRateEntry(CardModel.SpoilageTime.RatePerDaytimePoint, "Base"));}
                         if (BaseSpoilageRate.Count > 0)
                             texts.Add(BaseSpoilageRate.Join(delimiter: "\n"));
@@ -186,10 +191,15 @@ namespace CstiDetailedCardProgress
                         {
                             texts.Add(FormatRateEntry(CardModel.SpoilageTime.ExtraRateWhenEquipped, "Equipped"));
                         }
+                        if ((recipeStateChange?.SpoilageChange.x ?? 0) != 0)
+                        {
+                            texts.Add(FormatRateEntry(recipeStateChange.Value.SpoilageChange.x, $"Recipe {changeRecipe.ActionName}"));
+                        }
                     }
                     if (CardModel.UsageDurability && CardModel.UsageDurability.Show(__instance.ContainedLiquid, __instance.CurrentUsageDurability))
                     {
-                        texts.Add(FormatProgressAndRate(__instance.CurrentUsageDurability, (CardModel.UsageDurability.MaxValue == 0 ? CardModel.UsageDurability.FloatValue : CardModel.UsageDurability.MaxValue), (string.IsNullOrEmpty(CardModel.UsageDurability.CardStatName) ? "Usage" : __instance.CardModel.UsageDurability.CardStatName), __instance.CurrentUsageRate));
+                        texts.Add(FormatProgressAndRate(__instance.CurrentUsageDurability, (CardModel.UsageDurability.MaxValue == 0 ? CardModel.UsageDurability.FloatValue : CardModel.UsageDurability.MaxValue), (string.IsNullOrEmpty(CardModel.UsageDurability.CardStatName) ? "Usage" 
+                            : __instance.CardModel.UsageDurability.CardStatName), __instance.CurrentUsageRate + (recipeStateChange?.UsageChange.x ?? 0)));
                         if(CardModel.UsageDurability.RatePerDaytimePoint != 0){texts.Add(FormatRateEntry(CardModel.UsageDurability.RatePerDaytimePoint, "Base"));}
                         if (BaseUsageRate.Count > 0)
                             texts.Add(BaseUsageRate.Join(delimiter: "\n"));
@@ -211,10 +221,15 @@ namespace CstiDetailedCardProgress
                         {
                             texts.Add(FormatRateEntry(CardModel.UsageDurability.ExtraRateWhenEquipped, "Equipped"));
                         }
+                        if ((recipeStateChange?.UsageChange.x ?? 0) != 0)
+                        {
+                            texts.Add(FormatRateEntry(recipeStateChange.Value.UsageChange.x, $"Recipe {changeRecipe.ActionName}"));
+                        }
                     }
                     if (CardModel.FuelCapacity && CardModel.FuelCapacity.Show(__instance.ContainedLiquid, __instance.CurrentFuel))
                     {
-                        texts.Add(FormatProgressAndRate(__instance.CurrentFuel, CardModel.FuelCapacity.MaxValue, (string.IsNullOrEmpty(CardModel.FuelCapacity.CardStatName) ? "Fuel" : __instance.CardModel.FuelCapacity.CardStatName), __instance.CurrentFuelRate));
+                        texts.Add(FormatProgressAndRate(__instance.CurrentFuel, CardModel.FuelCapacity.MaxValue, (string.IsNullOrEmpty(CardModel.FuelCapacity.CardStatName) ? "Fuel" 
+                            : __instance.CardModel.FuelCapacity.CardStatName), __instance.CurrentFuelRate + (recipeStateChange?.FuelChange.x ?? 0)));
                         if(CardModel.FuelCapacity.RatePerDaytimePoint != 0){texts.Add(FormatRateEntry(CardModel.FuelCapacity.RatePerDaytimePoint, "Base"));}
                         if (BaseFuelRate.Count > 0)
                             texts.Add(BaseFuelRate.Join(delimiter: "\n"));
@@ -236,10 +251,15 @@ namespace CstiDetailedCardProgress
                         {
                             texts.Add(FormatRateEntry(CardModel.FuelCapacity.ExtraRateWhenEquipped, "Equipped"));
                         }
+                        if ((recipeStateChange?.FuelChange.x ?? 0) != 0)
+                        {
+                            texts.Add(FormatRateEntry(recipeStateChange.Value.FuelChange.x, $"Recipe {changeRecipe.ActionName}"));
+                        }
                     }
                     if (CardModel.Progress && CardModel.Progress.Show(__instance.ContainedLiquid, __instance.CurrentProgress))
                     {
-                        texts.Add(FormatProgressAndRate(__instance.CurrentProgress, CardModel.Progress.MaxValue, (string.IsNullOrEmpty(CardModel.Progress.CardStatName) ? "Progress" : __instance.CardModel.Progress.CardStatName), __instance.CurrentConsumableRate));
+                        texts.Add(FormatProgressAndRate(__instance.CurrentProgress, CardModel.Progress.MaxValue, (string.IsNullOrEmpty(CardModel.Progress.CardStatName) ? "Progress" 
+                            : __instance.CardModel.Progress.CardStatName), __instance.CurrentConsumableRate + (recipeStateChange?.ChargesChange.x ?? 0)));
                         if(CardModel.Progress.RatePerDaytimePoint != 0){texts.Add(FormatRateEntry(CardModel.Progress.RatePerDaytimePoint, "Base"));}
                         if (BaseConsumableRate.Count > 0)
                             texts.Add(BaseConsumableRate.Join(delimiter: "\n"));
@@ -261,11 +281,16 @@ namespace CstiDetailedCardProgress
                         {
                             texts.Add(FormatRateEntry(CardModel.Progress.ExtraRateWhenEquipped, "Equipped"));
                         }
+                        if ((recipeStateChange?.ChargesChange.x ?? 0) != 0)
+                        {
+                            texts.Add(FormatRateEntry(recipeStateChange.Value.ChargesChange.x, $"Recipe {changeRecipe.ActionName}"));
+                        }
                     }
 
                     if (__instance.IsLiquidContainer && __instance.ContainedLiquid)
                     {
-                        texts.Add(FormatProgressAndRate(__instance.ContainedLiquid.CurrentLiquidQuantity, CardModel.MaxLiquidCapacity, __instance.ContainedLiquidModel.CardName, __instance.ContainedLiquid.CurrentEvaporationRate));
+                        texts.Add(FormatProgressAndRate(__instance.ContainedLiquid.CurrentLiquidQuantity, CardModel.MaxLiquidCapacity, __instance.ContainedLiquidModel.CardName
+                            , (recipeStateChange?.ModifyLiquid ?? false) ? __instance.ContainedLiquid.CurrentEvaporationRate + (recipeStateChange?.LiquidQuantityChange.x ?? 0) : __instance.ContainedLiquid.CurrentEvaporationRate));
                         if (CardModel.LiquidEvaporationRate != 0) { texts.Add(FormatRateEntry(CardModel.LiquidEvaporationRate, "Base")); };
                         if (BaseEvaporationRate.Count > 0)
                             texts.Add(BaseEvaporationRate.Join(delimiter: "\n"));
@@ -279,12 +304,16 @@ namespace CstiDetailedCardProgress
                                 }
                             }
                         }
-
+                        if ((recipeStateChange?.ModifyLiquid ?? false) && (recipeStateChange?.LiquidQuantityChange.x ?? 0) != 0)
+                        {
+                            texts.Add(FormatRateEntry(recipeStateChange.Value.LiquidQuantityChange.x, $"Recipe {changeRecipe.ActionName}"));
+                        }
                     }
 
                     if (CardModel.SpecialDurability1 && CardModel.SpecialDurability1.Show(__instance.ContainedLiquid, __instance.CurrentSpecial1))
                     {
-                        texts.Add(FormatProgressAndRate(__instance.CurrentSpecial1, CardModel.SpecialDurability1.MaxValue, (string.IsNullOrEmpty(CardModel.SpecialDurability1.CardStatName) ? "SpecialDurability1" : __instance.CardModel.SpecialDurability1.CardStatName), __instance.CurrentSpecial1Rate));
+                        texts.Add(FormatProgressAndRate(__instance.CurrentSpecial1, CardModel.SpecialDurability1.MaxValue, (string.IsNullOrEmpty(CardModel.SpecialDurability1.CardStatName) ? "SpecialDurability1"
+                            : __instance.CardModel.SpecialDurability1.CardStatName), __instance.CurrentSpecial1Rate + (recipeStateChange?.Special1Change.x ?? 0)));
                         if(CardModel.SpecialDurability1.RatePerDaytimePoint != 0){texts.Add(FormatRateEntry(CardModel.SpecialDurability1.RatePerDaytimePoint, "Base"));}
                         if (BaseSpecial1Rate.Count > 0)
                             texts.Add(BaseSpecial1Rate.Join(delimiter: "\n"));
@@ -306,11 +335,16 @@ namespace CstiDetailedCardProgress
                         {
                             texts.Add(FormatRateEntry(CardModel.SpecialDurability1.ExtraRateWhenEquipped, "Equipped"));
                         }
+                        if ((recipeStateChange?.Special1Change.x ?? 0) != 0)
+                        {
+                            texts.Add(FormatRateEntry(recipeStateChange.Value.Special1Change.x, $"Recipe {changeRecipe.ActionName}"));
+                        }
                     }
 
                     if (CardModel.SpecialDurability2 && CardModel.SpecialDurability2.Show(__instance.ContainedLiquid, __instance.CurrentSpecial2))
                     {
-                        texts.Add(FormatProgressAndRate(__instance.CurrentSpecial2, CardModel.SpecialDurability2.MaxValue, (string.IsNullOrEmpty(CardModel.SpecialDurability2.CardStatName) ? "SpecialDurability2" : __instance.CardModel.SpecialDurability2.CardStatName), __instance.CurrentSpecial2Rate));
+                        texts.Add(FormatProgressAndRate(__instance.CurrentSpecial2, CardModel.SpecialDurability2.MaxValue, (string.IsNullOrEmpty(CardModel.SpecialDurability2.CardStatName) ? "SpecialDurability2" 
+                            : __instance.CardModel.SpecialDurability2.CardStatName), __instance.CurrentSpecial2Rate + (recipeStateChange?.Special2Change.x ?? 0)));
                         if(CardModel.SpecialDurability2.RatePerDaytimePoint != 0){texts.Add(FormatRateEntry(CardModel.SpecialDurability2.RatePerDaytimePoint, "Base"));}
                         if (BaseSpecial2Rate.Count > 0)
                             texts.Add(BaseSpecial2Rate.Join(delimiter: "\n"));
@@ -332,11 +366,16 @@ namespace CstiDetailedCardProgress
                         {
                             texts.Add(FormatRateEntry(CardModel.SpecialDurability2.ExtraRateWhenEquipped, "Equipped"));
                         }
+                        if ((recipeStateChange?.Special2Change.x ?? 0) != 0)
+                        {
+                            texts.Add(FormatRateEntry(recipeStateChange.Value.Special2Change.x, $"Recipe {changeRecipe.ActionName}"));
+                        }
                     }
 
                     if (CardModel.SpecialDurability3 && CardModel.SpecialDurability3.Show(__instance.ContainedLiquid, __instance.CurrentSpecial3))
                     {
-                        texts.Add(FormatProgressAndRate(__instance.CurrentSpecial3, CardModel.SpecialDurability3.MaxValue, (string.IsNullOrEmpty(CardModel.SpecialDurability3.CardStatName) ? "SpecialDurability3" : __instance.CardModel.SpecialDurability3.CardStatName), __instance.CurrentSpecial3Rate));
+                        texts.Add(FormatProgressAndRate(__instance.CurrentSpecial3, CardModel.SpecialDurability3.MaxValue, (string.IsNullOrEmpty(CardModel.SpecialDurability3.CardStatName) ? "SpecialDurability3"
+                            : __instance.CardModel.SpecialDurability3.CardStatName), __instance.CurrentSpecial3Rate + (recipeStateChange?.Special3Change.x ?? 0)));
                         if(CardModel.SpecialDurability3.RatePerDaytimePoint != 0){texts.Add(FormatRateEntry(CardModel.SpecialDurability3.RatePerDaytimePoint, "Base"));}
                         if (BaseSpecial3Rate.Count > 0)
                             texts.Add(BaseSpecial3Rate.Join(delimiter: "\n"));
@@ -358,11 +397,16 @@ namespace CstiDetailedCardProgress
                         {
                             texts.Add(FormatRateEntry(CardModel.SpecialDurability3.ExtraRateWhenEquipped, "Equipped"));
                         }
+                        if ((recipeStateChange?.Special3Change.x ?? 0) != 0)
+                        {
+                            texts.Add(FormatRateEntry(recipeStateChange.Value.Special3Change.x, $"Recipe {changeRecipe.ActionName}"));
+                        }
                     }
 
                     if (CardModel.SpecialDurability4 && CardModel.SpecialDurability4.Show(__instance.ContainedLiquid, __instance.CurrentSpecial4))
                     {
-                        texts.Add(FormatProgressAndRate(__instance.CurrentSpecial4, CardModel.SpecialDurability4.MaxValue, (string.IsNullOrEmpty(CardModel.SpecialDurability4.CardStatName) ? "SpecialDurability4" : __instance.CardModel.SpecialDurability4.CardStatName), __instance.CurrentSpecial4Rate));
+                        texts.Add(FormatProgressAndRate(__instance.CurrentSpecial4, CardModel.SpecialDurability4.MaxValue, (string.IsNullOrEmpty(CardModel.SpecialDurability4.CardStatName) ? "SpecialDurability4"
+                            : __instance.CardModel.SpecialDurability4.CardStatName), __instance.CurrentSpecial4Rate + (recipeStateChange?.Special4Change.x ?? 0)));
                         if(CardModel.SpecialDurability4.RatePerDaytimePoint != 0){texts.Add(FormatRateEntry(CardModel.SpecialDurability4.RatePerDaytimePoint, "Base"));}
                         if (BaseSpecial4Rate.Count > 0)
                             texts.Add(BaseSpecial4Rate.Join(delimiter: "\n"));
@@ -383,6 +427,10 @@ namespace CstiDetailedCardProgress
                         if (CardModel.SpecialDurability4.ExtraRateWhenEquipped != 0 && GraphicsM && GraphicsM.CharacterWindow.HasCardEquipped(__instance))
                         {
                             texts.Add(FormatRateEntry(CardModel.SpecialDurability4.ExtraRateWhenEquipped, "Equipped"));
+                        }
+                        if ((recipeStateChange?.Special4Change.x ?? 0) != 0)
+                        {
+                            texts.Add(FormatRateEntry(recipeStateChange.Value.Special4Change.x, $"Recipe {changeRecipe.ActionName}"));
                         }
                     }
 
@@ -430,6 +478,23 @@ namespace CstiDetailedCardProgress
         public static void EquipmentButtonOnDisablePatch()
         {
             inGamePlayerWeight = null;
+        }
+
+        public static CookingRecipe GetRecipeStateChange(InGameCardBase card)
+        {
+            CookingRecipe recipeForCard;
+            if (card.ContainedLiquid != null)
+            {
+                recipeForCard = card.CurrentContainer?.CardModel?.GetRecipeForCard(card.ContainedLiquid.CardModel, card.ContainedLiquid, card.CurrentContainer);
+            }
+            else {
+                recipeForCard = card.CurrentContainer?.CardModel?.GetRecipeForCard(card.CardModel, card, card.CurrentContainer);
+            }
+            if (recipeForCard != null && (recipeForCard.IngredientChanges.ModType == CardModifications.DurabilityChanges || card.ContainedLiquid && recipeForCard.IngredientChanges.ModifyLiquid))
+            {
+                    return recipeForCard;
+            }
+            return null;
         }
     }
 }
