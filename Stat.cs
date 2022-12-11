@@ -31,11 +31,12 @@ namespace CstiDetailedCardProgress
             List<string> rateModsTexts = new();
             if (stat.CurrentBaseValue != 0) { valueModsTexts.Add(FormatBasicEntry($"{stat.CurrentBaseValue:0.##}", "Base", indent: 2)); }
             GameManager gm = MBSingleton<GameManager>.Instance;
-            if (gm != null && !gm.NotInBase)
-            {
-                if (stat.AtBaseModifiedValue != 0) valueModsTexts.Add(FormatTooltipEntry(stat.AtBaseModifiedValue, "At base", 2));
-                if (stat.AtBaseModifiedRate != 0) rateModsTexts.Add(FormatRateEntry(stat.AtBaseModifiedRate, "At base"));
-            }
+            // Seems deplicated with some sources in stat.ModifierSources
+            //if (gm != null && !gm.NotInBase)
+            //{
+            //    if (stat.AtBaseModifiedValue != 0) valueModsTexts.Add(FormatTooltipEntry(stat.AtBaseModifiedValue, "At base", 2));
+            //    if (stat.AtBaseModifiedRate != 0) rateModsTexts.Add(FormatRateEntry(stat.AtBaseModifiedRate, "At base"));
+            //}
             if (stat.CurrentBaseRate != 0) { rateModsTexts.Add(FormatRateEntry(stat.CurrentBaseRate, "Base")); }
             stat.ModifierSources.ForEach(modifierSource =>
             {
