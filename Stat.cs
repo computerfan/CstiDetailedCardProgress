@@ -65,9 +65,9 @@ namespace CstiDetailedCardProgress
                 List<string> stalenessText = new();
                 stat.StalenessValues.ForEach(staleness =>
                 {
-                    if (staleness.Quantity > 0 && stat.StatModel.StalenessMultiplier != 0)
+                    if (staleness.Quantity > -1 && stat.StatModel.StalenessMultiplier != 0)
                     {
-                        stalenessText.Add(FormatBasicEntry($"{ Mathf.Pow(stat.StatModel.StalenessMultiplier, staleness.Quantity):G3}", $"(est. {stat.StatModel.NoveltyCooldownDuration - gm.CurrentTickInfo.z + staleness.LastTick + Math.Max(0, staleness.Quantity - 1) * stat.StatModel.NoveltyCooldownDuration}t) {staleness.ModifierSource}", indent: 2));
+                        stalenessText.Add(FormatBasicEntry($"{ Mathf.Pow(stat.StatModel.StalenessMultiplier, staleness.Quantity + 1):G3}", $"(est. {stat.StatModel.NoveltyCooldownDuration - gm.CurrentTickInfo.z + staleness.LastTick + Math.Max(0, staleness.Quantity) * stat.StatModel.NoveltyCooldownDuration}t) {staleness.ModifierSource}", indent: 2));
                     }
                 });
                 if (stalenessText.Count > 0)
