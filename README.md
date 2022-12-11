@@ -36,3 +36,4 @@ See <https://docs.bepinex.dev/v5.4.21/articles/user_guide/installation/index.htm
 ## 1.0.3 
 - Adds enable/disable hotkey.
 - Shows action staleness on character stats.
+- Add up rate modification from cooking recipe.
