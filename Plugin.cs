@@ -27,6 +27,7 @@ namespace CstiDetailedCardProgress
             // Plugin startup logic
             Harmony.CreateAndPatchAll(typeof(Plugin));
             Harmony.CreateAndPatchAll(typeof(Stat));
+            Harmony.CreateAndPatchAll(typeof(Action));
 
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
