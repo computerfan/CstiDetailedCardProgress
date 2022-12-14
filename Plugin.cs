@@ -63,7 +63,7 @@ namespace CstiDetailedCardProgress
 
                 if (CardModel)
                 {
-                    bool isShowWeightType = Array.IndexOf(new CardTypes[] { CardTypes.Hand, CardTypes.Item }, CardModel.CardType) > -1;
+                    bool isShowWeightType = Array.IndexOf(new CardTypes[] { CardTypes.Hand, CardTypes.Item, CardTypes.Location }, CardModel.CardType) > -1;
                     if (isShowWeightType && (__instance.CurrentWeight != 0 || CardModel.WeightReductionWhenEquipped != 0 || __instance.CardsInInventory != null && __instance.CardsInInventory.Count > 0)) {
                         texts.Add(FormatWeight(__instance.CurrentWeight));
 
