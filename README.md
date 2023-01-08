@@ -13,6 +13,7 @@ The configuration file can be found at /BepInEx/config/CstiDetailedCardProgress.
 |--|--|--|
 |Enabled|true|If set to true, will show the details tooltips|
 |HotKey|F2|The key to enable and disable the tool tips|
+|RecipesShowTargetDuration|false|If true, cookers like traps will show exact cooking duration instead of a range.|
 
 __Toggle Note__: When using the hotkey to enable/disable the detailed tooltips, the tooltips will not be updated until the user moves the mouse off of a card.
 

@@ -18,11 +18,13 @@ namespace CstiDetailedCardProgress
         public static InGameStat inGamePlayerWeight;
         public static bool Enabled;
         public static KeyCode HotKey;
+        public static bool RecipesShowTargetDuration;
 
         private void Awake()
         {
             Enabled = Config.Bind("General", nameof(Enabled), true, "If true, will show the tool tips.").Value;
             HotKey = Config.Bind("General", nameof(HotKey), KeyCode.F2, "The key to enable and disable the tool tips").Value;
+            RecipesShowTargetDuration = Config.Bind("Tweak", nameof(RecipesShowTargetDuration), false, "If true, cookers like traps will show exact cooking duration instead of a range.").Value;
 
             // Plugin startup logic
             Harmony.CreateAndPatchAll(typeof(Plugin));
@@ -50,6 +52,7 @@ namespace CstiDetailedCardProgress
             {
                 CardData CardModel = __instance.CardModel;
                 GraphicsManager GraphicsM = Traverse.Create(__instance).Field("GraphicsM").GetValue<GraphicsManager>();
+                GameManager GM = GameManager.Instance;
                 List<string> BaseSpoilageRate = new();
                 List<string> BaseUsageRate = new();
                 List<string> BaseFuelRate = new();
@@ -63,6 +66,30 @@ namespace CstiDetailedCardProgress
 
                 if (CardModel)
                 {
+                    if(CardModel.CardType == CardTypes.Location && __instance.IsCooking())
+                    {
+                        foreach(CookingCardStatus cookingstatus in __instance.CookingCards)
+                        {
+                            CookingRecipe recipe = CardModel.GetRecipeForCard(cookingstatus.Card.CardModel, cookingstatus.Card, __instance);
+                            if (!RecipesShowTargetDuration && recipe.MinDuration != recipe.MaxDuration)
+                            {
+                                texts.Add(FormatBasicEntry($"{cookingstatus.CookedDuration}/[{recipe.MinDuration}, {recipe.MaxDuration}]", $"{recipe.ActionName}"));
+                                texts.Add(FormatRate(1, cookingstatus.CookedDuration, recipe.MaxDuration));
+                            }
+                            else
+                            {
+                                texts.Add(FormatBasicEntry($"{cookingstatus.CookedDuration}/{cookingstatus.TargetDuration}", $"{recipe.ActionName}"));
+                                texts.Add(FormatRate(1, cookingstatus.CookedDuration, cookingstatus.TargetDuration));
+                            }
+                            if (recipe != null && recipe.DropsAsCollection != null && recipe.DropsAsCollection.Length != 0)
+                            {
+                                CardOnCardAction cardOnCardAction = recipe.GetResult(cookingstatus.Card);
+                                CollectionDropReport dropReport = GM.GetCollectionDropsReport(cardOnCardAction, __instance, false);
+                                texts.Add(Action.FormatCardDropList(dropReport, __instance, indent: 2));
+                            }
+                        }
+                    }
+
                     bool isShowWeightType = Array.IndexOf(new CardTypes[] { CardTypes.Hand, CardTypes.Item, CardTypes.Location }, CardModel.CardType) > -1;
                     if (isShowWeightType && (__instance.CurrentWeight != 0 || CardModel.WeightReductionWhenEquipped != 0 || __instance.CardsInInventory != null && __instance.CardsInInventory.Count > 0)) {
                         texts.Add(FormatWeight(__instance.CurrentWeight));
@@ -118,41 +145,43 @@ namespace CstiDetailedCardProgress
                         {
                             continue;
                         }
+                        int multiplier = _Effect.EffectStacksWithRequiredCards ? _Effect.CurrentStack : 1;
+                        string entryValue = _Effect.EffectStacksWithRequiredCards ? $"{_Effect.CurrentStack}x {_Effect.EffectName}" : _Effect.EffectName;
                         if ((bool)CardModel.SpoilageTime && (bool)_Effect.SpoilageRateModifier)
                         {
-                            BaseSpoilageRate.Add(FormatRateEntry(_Effect.SpoilageRateModifier.FloatValue, _Effect.EffectName));
+                            BaseSpoilageRate.Add(FormatRateEntry(multiplier * _Effect.SpoilageRateModifier.FloatValue, entryValue));
                         }
                         if ((bool)CardModel.UsageDurability && (bool)_Effect.UsageRateModifier)
                         {
-                            BaseUsageRate.Add(FormatRateEntry(_Effect.UsageRateModifier.FloatValue, _Effect.EffectName));
+                            BaseUsageRate.Add(FormatRateEntry(multiplier * _Effect.UsageRateModifier.FloatValue, entryValue));
                         }
                         if ((bool)CardModel.FuelCapacity && (bool)_Effect.FuelRateModifier)
                         {
-                            BaseFuelRate.Add(FormatRateEntry(_Effect.FuelRateModifier.FloatValue, _Effect.EffectName));
+                            BaseFuelRate.Add(FormatRateEntry(multiplier * _Effect.FuelRateModifier.FloatValue, entryValue));
                         }
                         if ((bool)CardModel.Progress && (bool)_Effect.ConsumableChargesModifier)
                         {
-                            BaseConsumableRate.Add(FormatRateEntry(_Effect.ConsumableChargesModifier.FloatValue, _Effect.EffectName));
+                            BaseConsumableRate.Add(FormatRateEntry(multiplier * _Effect.ConsumableChargesModifier.FloatValue, entryValue));
                         }
                         if (__instance.IsLiquidContainer && __instance.ContainedLiquid && _Effect.LiquidRateModifier != 0)
                         {
-                            BaseEvaporationRate.Add(FormatRateEntry(_Effect.LiquidRateModifier, _Effect.EffectName));
+                            BaseEvaporationRate.Add(FormatRateEntry(multiplier * _Effect.LiquidRateModifier, entryValue));
                         }
                         if ((bool)CardModel.SpecialDurability1 && (bool)_Effect.Special1RateModifier)
                         {
-                            BaseSpecial1Rate.Add(FormatRateEntry(_Effect.Special1RateModifier.FloatValue, _Effect.EffectName));
+                            BaseSpecial1Rate.Add(FormatRateEntry(multiplier * _Effect.Special1RateModifier.FloatValue, entryValue));
                         }
                         if ((bool)CardModel.SpecialDurability2 && (bool)_Effect.Special2RateModifier)
                         {
-                            BaseSpecial2Rate.Add(FormatRateEntry(_Effect.Special2RateModifier.FloatValue, _Effect.EffectName));
+                            BaseSpecial2Rate.Add(FormatRateEntry(multiplier * _Effect.Special2RateModifier.FloatValue, entryValue));
                         }
                         if ((bool)CardModel.SpecialDurability3 && (bool)_Effect.Special3RateModifier)
                         {
-                            BaseSpecial3Rate.Add(FormatRateEntry(_Effect.Special3RateModifier.FloatValue, _Effect.EffectName));
+                            BaseSpecial3Rate.Add(FormatRateEntry(multiplier * _Effect.Special3RateModifier.FloatValue, entryValue));
                         }
                         if ((bool)CardModel.SpecialDurability4 && (bool)_Effect.Special4RateModifier)
                         {
-                            BaseSpecial4Rate.Add(FormatRateEntry(_Effect.Special4RateModifier.FloatValue, _Effect.EffectName));
+                            BaseSpecial4Rate.Add(FormatRateEntry(multiplier * _Effect.Special4RateModifier.FloatValue, entryValue));
                         }
                     }
 
@@ -164,7 +193,7 @@ namespace CstiDetailedCardProgress
                         }
                     }
 
-                    CookingRecipe changeRecipe = GetRecipeStateChange(__instance);
+                    CookingRecipe changeRecipe = GetRecipeForCard(__instance);
                     CardStateChange? recipeStateChange = changeRecipe?.IngredientChanges;
 
                     if (CardModel.SpoilageTime && CardModel.SpoilageTime.Show(__instance.ContainedLiquid, __instance.CurrentSpoilage))
@@ -481,7 +510,7 @@ namespace CstiDetailedCardProgress
             inGamePlayerWeight = null;
         }
 
-        public static CookingRecipe GetRecipeStateChange(InGameCardBase card)
+        public static CookingRecipe GetRecipeForCard(InGameCardBase card)
         {
             CookingRecipe recipeForCard;
             if (card.ContainedLiquid != null)
