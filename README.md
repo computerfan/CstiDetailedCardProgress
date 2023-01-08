@@ -42,3 +42,8 @@ See <https://docs.bepinex.dev/v5.4.21/articles/user_guide/installation/index.htm
 ## 1.0.4
 - Shows probabilities for results of actions in events.
 - Adds tooltips to placed containers like chests (issue #2).
+
+## 1.0.5
+- Shows trap duration and drop probability.
+- Adds up stacking passive effects of multiple cards.
+- Add Simplified Chinese localization
