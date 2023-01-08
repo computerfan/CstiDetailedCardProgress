@@ -48,10 +48,10 @@ namespace CstiDetailedCardProgress
                 float dropRate = report.GetDropPercent(i, withStat, withCard, withDuability);
                 if (dropRate < 0.00001) continue;
                 texts.Add(FormatBasicEntry($"{dropRate:P2}", $"{report.DropsInfo[i].CollectionName}", indent: indent));
-                texts.Add(FormatBasicEntry($"{report.DropsInfo[i].FinalWeight}/{report.TotalValue}", "Weight", indent: 2 + indent));
+                texts.Add(FormatBasicEntry($"{report.DropsInfo[i].FinalWeight}/{report.TotalValue}", new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.Weight", DefaultText = "Weight" }, indent: 2 + indent));
                 if (report.DropsInfo[i].BaseWeight != 0)
                 {
-                    texts.Add(FormatTooltipEntry(report.DropsInfo[i].BaseWeight, "Base", 4 + indent));
+                    texts.Add(FormatTooltipEntry(report.DropsInfo[i].BaseWeight, new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.Base", DefaultText = "Base" }, 4 + indent));
                 }
                 if (withStat && report.DropsInfo[i].StatMods != null)
                 {

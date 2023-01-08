@@ -10,7 +10,7 @@ namespace CstiDetailedCardProgress
     {
         public static string FormatWeight(float weight)
         {
-            return $"<color=\"yellow\">{weight:0.#}</color> Weight";
+            return $"<color=\"yellow\">{weight:0.#}</color> {new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.FormatWeight.Weight", DefaultText = "Weight" }}";
         }
 
         public static string FormatProgressAndRate(float current, float max, string name, float rate, int indent = 0)
@@ -26,11 +26,11 @@ namespace CstiDetailedCardProgress
         {
             if (ts.Days >= 1)
             {
-                return $"{ts.Days:0}d{ts.Hours:0}h";
+                return $"{ts.Days:0}{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.d", DefaultText = "d" }}{ts.Hours:0}{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.h", DefaultText = "h" }}";
             }
             else
             {
-                return $"{ts.Hours:0}h";
+                return $"{ts.Hours:0}{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.h", DefaultText = "h" }}";
             }
         }
         public static string FormatRate(float value, float current, float max, float min = 0)
@@ -40,15 +40,15 @@ namespace CstiDetailedCardProgress
             {
                 float time = Math.Abs((max - current) / value);
                 TimeSpan timeSpan = new TimeSpan(0, (int)(Math.Ceiling(time) * 15), 0);
-                est = $" (est. {Math.Ceiling(time)}t/{TimeSpanFormat(timeSpan)})";
+                est = $" ({new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.est.", DefaultText = "est." }} {Math.Ceiling(time)}t/{TimeSpanFormat(timeSpan)})";
             }
             else if (value < 0 && current > min)
             {
                 float time = Math.Abs((current - min) / value);
                 TimeSpan timeSpan = new TimeSpan(0, (int)(Math.Ceiling(time) * 15), 0);
-                est = $" (est. {Math.Ceiling(time)}t/{TimeSpanFormat(timeSpan)})";
+                est = $" ({new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.est.", DefaultText = "est." }} {Math.Ceiling(time)}t/{TimeSpanFormat(timeSpan)})";
             }
-            return FormatTooltipEntry(value, $"Rate<size=70%>{est}</size>", 2);
+            return FormatTooltipEntry(value, $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Rate",DefaultText = "Rate" }}<size=70%>{est}</size>", 2);
         }
         public static string FormatRateEntry(float value, string name)
         {

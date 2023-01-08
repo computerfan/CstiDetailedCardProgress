@@ -29,7 +29,7 @@ namespace CstiDetailedCardProgress
             List<string> texts = new();
             List<string> valueModsTexts = new();
             List<string> rateModsTexts = new();
-            if (stat.CurrentBaseValue != 0) { valueModsTexts.Add(FormatBasicEntry($"{stat.CurrentBaseValue:0.##}", "Base", indent: 2)); }
+            if (stat.CurrentBaseValue != 0) { valueModsTexts.Add(FormatBasicEntry($"{stat.CurrentBaseValue:0.##}", new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Stat.Base", DefaultText = "Base" }, indent: 2)); }
             GameManager gm = MBSingleton<GameManager>.Instance;
             // Seems deplicated with some sources in stat.ModifierSources
             //if (gm != null && !gm.NotInBase)
@@ -37,7 +37,7 @@ namespace CstiDetailedCardProgress
             //    if (stat.AtBaseModifiedValue != 0) valueModsTexts.Add(FormatTooltipEntry(stat.AtBaseModifiedValue, "At base", 2));
             //    if (stat.AtBaseModifiedRate != 0) rateModsTexts.Add(FormatRateEntry(stat.AtBaseModifiedRate, "At base"));
             //}
-            if (stat.CurrentBaseRate != 0) { rateModsTexts.Add(FormatRateEntry(stat.CurrentBaseRate, "Base")); }
+            if (stat.CurrentBaseRate != 0) { rateModsTexts.Add(FormatRateEntry(stat.CurrentBaseRate, new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Stat.Base", DefaultText = "Base" })); }
             stat.ModifierSources.ForEach(modifierSource =>
             {
                 string source = GetModifierSourceName(modifierSource);
@@ -72,7 +72,7 @@ namespace CstiDetailedCardProgress
                 });
                 if (stalenessText.Count > 0)
                 {
-                    texts.Add(FormatBasicEntry("Action Staleness", $"(*{1 / stat.StatModel.StalenessMultiplier:0.##}/{stat.StatModel.NoveltyCooldownDuration}t)"));
+                    texts.Add(FormatBasicEntry(new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Stat.ActionStaleness", DefaultText = "Action Staleness" }, $"(*{1 / stat.StatModel.StalenessMultiplier:0.##}/{stat.StatModel.NoveltyCooldownDuration}t)"));
                     texts.Add(stalenessText.Join(delimiter: "\n"));
                 }
             }
@@ -100,7 +100,7 @@ namespace CstiDetailedCardProgress
             }
             else if (modifierSource.TimeOfDay != null)
             {
-                sourceName = $"Time {modifierSource.TimeOfDay.EffectStartingTime}~{modifierSource.TimeOfDay.EffectEndTime}";
+                sourceName = $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Stat.Time", DefaultText = "Time" }} {modifierSource.TimeOfDay.EffectStartingTime}~{modifierSource.TimeOfDay.EffectEndTime}";
             }
             return sourceName;
         }
