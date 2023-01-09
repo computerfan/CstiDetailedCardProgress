@@ -227,6 +227,37 @@ namespace CstiDetailedCardProgress
                             texts.Add(FormatRateEntry(recipeStateChange.Value.SpoilageChange.x, $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
                         }
                     }
+                    // liquid spoilage temp fix
+                    if (__instance.ContainedLiquid?.CardModel?.SpoilageTime)
+                    {
+                        texts.Add(FormatProgressAndRate(__instance.ContainedLiquid.CurrentSpoilage, (__instance.ContainedLiquid.CardModel.SpoilageTime.MaxValue == 0 ? __instance.ContainedLiquid.CardModel.SpoilageTime.FloatValue
+                            : __instance.ContainedLiquid.CardModel.SpoilageTime.MaxValue), (string.IsNullOrEmpty(__instance.ContainedLiquid.CardModel.SpoilageTime.CardStatName) ? new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Spoilage", DefaultText = "Spoilage" } : __instance.ContainedLiquid.CardModel.SpoilageTime.CardStatName), __instance.ContainedLiquid.CurrentSpoilageRate + (recipeStateChange?.SpoilageChange.x ?? 0)));
+                        if (__instance.ContainedLiquid.CardModel.SpoilageTime.RatePerDaytimePoint != 0) { texts.Add(FormatRateEntry(__instance.ContainedLiquid.CardModel.SpoilageTime.RatePerDaytimePoint, new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Base", DefaultText = "Base" })); }
+                        if (BaseSpoilageRate.Count > 0)
+                            texts.Add(BaseSpoilageRate.Join(delimiter: "\n"));
+                        if (__instance.ContainedLiquid.IsCooking())
+                        {
+                            texts.Add(FormatRateEntry(__instance.ContainedLiquid.CardModel.CookingConditions.ExtraSpoilageRate, new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Cooking", DefaultText = "Cooking" }));
+                        }
+                        if (__instance.ContainedLiquid.CardModel.LocalCounterEffects != null)
+                        {
+                            for (int i = 0; i < __instance.ContainedLiquid.CardModel.LocalCounterEffects.Length; i++)
+                            {
+                                if (__instance.ContainedLiquid.CardModel.LocalCounterEffects[i].IsActive(__instance.ContainedLiquid))
+                                {
+                                    texts.Add(FormatRateEntry(__instance.ContainedLiquid.CardModel.LocalCounterEffects[i].SpoilageRateModifier.FloatValue, __instance.ContainedLiquid.CardModel.LocalCounterEffects[i].Counter.name));
+                                }
+                            }
+                        }
+                        if (__instance.ContainedLiquid.CardModel.SpoilageTime.ExtraRateWhenEquipped != 0 && GraphicsM && GraphicsM.CharacterWindow.HasCardEquipped(__instance.ContainedLiquid))
+                        {
+                            texts.Add(FormatRateEntry(__instance.ContainedLiquid.CardModel.SpoilageTime.ExtraRateWhenEquipped, new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
+                        }
+                        if ((recipeStateChange?.SpoilageChange.x ?? 0) != 0)
+                        {
+                            texts.Add(FormatRateEntry(recipeStateChange.Value.SpoilageChange.x, $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
+                        }
+                    }
                     if (CardModel.UsageDurability && CardModel.UsageDurability.Show(__instance.ContainedLiquid, __instance.CurrentUsageDurability))
                     {
                         texts.Add(FormatProgressAndRate(__instance.CurrentUsageDurability, (CardModel.UsageDurability.MaxValue == 0 ? CardModel.UsageDurability.FloatValue : CardModel.UsageDurability.MaxValue), (string.IsNullOrEmpty(CardModel.UsageDurability.CardStatName) ? new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Usage", DefaultText = "Usage" } 
