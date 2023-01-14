@@ -47,3 +47,7 @@ See <https://docs.bepinex.dev/v5.4.21/articles/user_guide/installation/index.htm
 - Shows trap duration and drop probability.
 - Adds up stacking passive effects of multiple cards.
 - Add Simplified Chinese localization
+
+## 1.0.6
+- Shows liquid spoilage.
+- No longer shows stat modifiers from unknown sources.

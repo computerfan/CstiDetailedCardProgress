@@ -4,7 +4,7 @@
     <TargetFramework>net462</TargetFramework>
     <AssemblyName>CstiDetailedCardProgress</AssemblyName>
     <Description>CSTI Detailed Card Progress Mod</Description>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <PackageId>space.cfan.CstiDetailedCardProgress</PackageId>
@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
-    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <PackageReference Include="BepInEx.Core" Version="5.4.17" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
 	<PackageReference Include="UnityEngine.Modules" Version="2019.4.35" IncludeAssets="compile" />
   </ItemGroup>
