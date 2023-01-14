@@ -38,18 +38,21 @@ namespace CstiDetailedCardProgress
             //    if (stat.AtBaseModifiedRate != 0) rateModsTexts.Add(FormatRateEntry(stat.AtBaseModifiedRate, "At base"));
             //}
             if (stat.CurrentBaseRate != 0) { rateModsTexts.Add(FormatRateEntry(stat.CurrentBaseRate, new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Stat.Base", DefaultText = "Base" })); }
-            stat.ModifierSources.ForEach(modifierSource =>
+            foreach(StatModifierSource modifierSource in stat.ModifierSources)
             {
-                string source = GetModifierSourceName(modifierSource);
-                if (modifierSource.Rate != 0)
-                { 
-                    rateModsTexts.Add(FormatRateEntry(modifierSource.Rate, source));
-                }
-                if (modifierSource.Value != 0)
+                if(modifierSource.ValidNumbers && modifierSource.ValidSource)
                 {
-                    valueModsTexts.Add(FormatTooltipEntry(modifierSource.Value, source, 2));
+                    string source = GetModifierSourceName(modifierSource);
+                    if (modifierSource.Rate != 0)
+                    {
+                        rateModsTexts.Add(FormatRateEntry(modifierSource.Rate, source));
+                    }
+                    if (modifierSource.Value != 0)
+                    {
+                        valueModsTexts.Add(FormatTooltipEntry(modifierSource.Value, source, 2));
+                    }
                 }
-            });
+            }
             texts.Add(FormatBasicEntry($"{stat.SimpleCurrentValue:0.##}: [{stat.StatModel.MinMaxValue.x:0.##}, {stat.StatModel.MinMaxValue.y:0.##}]", stat.StatModel.GameName));
             if (valueModsTexts.Count > 0)
             {
