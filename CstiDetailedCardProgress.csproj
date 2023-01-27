@@ -13,6 +13,7 @@
     <Product>CSTIDetailedCardProgressMod</Product>
     <Company />
 	<GameAssemblyPath Condition="'$(GameAssemblyPath)' == ''">..\..\Card Survival - Tropical Island_Data\Managed</GameAssemblyPath>
+	<DebugType>Full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
