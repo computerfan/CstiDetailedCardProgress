@@ -71,7 +71,9 @@ namespace CstiDetailedCardProgress
                     {
                         foreach(CookingCardStatus cookingstatus in __instance.CookingCards)
                         {
+                            if (cookingstatus == null || cookingstatus.Card == null) continue;
                             CookingRecipe recipe = CardModel.GetRecipeForCard(cookingstatus.Card.CardModel, cookingstatus.Card, __instance);
+                            if (recipe == null) continue;
                             if (!RecipesShowTargetDuration && recipe.MinDuration != recipe.MaxDuration)
                             {
                                 texts.Add(FormatBasicEntry($"{cookingstatus.CookedDuration}/[{recipe.MinDuration}, {recipe.MaxDuration}]", $"{recipe.ActionName}"));
@@ -82,7 +84,7 @@ namespace CstiDetailedCardProgress
                                 texts.Add(FormatBasicEntry($"{cookingstatus.CookedDuration}/{cookingstatus.TargetDuration}", $"{recipe.ActionName}"));
                                 texts.Add(FormatRate(1, cookingstatus.CookedDuration, cookingstatus.TargetDuration));
                             }
-                            if (recipe != null && recipe.DropsAsCollection != null && recipe.DropsAsCollection.Length != 0)
+                            if (recipe.DropsAsCollection != null && recipe.DropsAsCollection.Length != 0)
                             {
                                 CardOnCardAction cardOnCardAction = recipe.GetResult(cookingstatus.Card);
                                 CollectionDropReport dropReport = GM.GetCollectionDropsReport(cardOnCardAction, __instance, false);
