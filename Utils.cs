@@ -70,13 +70,16 @@ namespace CstiDetailedCardProgress
         public static string FormatStatModifier(StatModifier statModifier, int indent = 0)
         {
             List<string> texts = new();
-            if (statModifier.ValueModifier.magnitude != 0)
+            if (statModifier.Stat != null)
             {
-                texts.Add(FormatBasicEntry($"{FormatMinMaxValue(statModifier.ValueModifier)}", $"{statModifier.Stat.GameName}", indent: indent));
-            }
-            if (statModifier.RateModifier.magnitude != 0)
-            {
-                texts.Add(FormatBasicEntry($"{FormatMinMaxValue(statModifier.RateModifier)}", $"{statModifier.Stat.GameName} {new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Rate", DefaultText = "Rate" }}", indent: indent));
+                if (statModifier.ValueModifier.magnitude != 0)
+                {
+                    texts.Add(FormatBasicEntry($"{FormatMinMaxValue(statModifier.ValueModifier)}", $"{statModifier.Stat.GameName}", indent: indent));
+                }
+                if (statModifier.RateModifier.magnitude != 0)
+                {
+                    texts.Add(FormatBasicEntry($"{FormatMinMaxValue(statModifier.RateModifier)}", $"{statModifier.Stat.GameName} {new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Rate", DefaultText = "Rate" }}", indent: indent));
+                }
             }
             return texts.Join(delimiter: "\n");
         }
