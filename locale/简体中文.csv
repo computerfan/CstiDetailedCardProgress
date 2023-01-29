@@ -26,3 +26,4 @@ CstiDetailedCardProgress.h,,时
 CstiDetailedCardProgress.LiquidQuantityChange,,液体量
 CstiDetailedCardProgress.StatModifier,,状态修正
 CstiDetailedCardProgress.CardStateChange,,卡牌状态变更
+CstiDetailedCardProgress.Action.CardDrops,,卡牌掉落

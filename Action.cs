@@ -27,7 +27,7 @@ namespace CstiDetailedCardProgress
                 if (popup && popup.CurrentCard)
                 {
                     InGameCardBase currentCard = popup.CurrentCard.ContainedLiquid == null ? popup.CurrentCard : popup.CurrentCard.ContainedLiquid;
-                    if (__instance.Index < currentCard.DismantleActions.Length)
+                    if (currentCard.CardModel.CardType != CardTypes.Blueprint && __instance.Index > -1 && __instance.Index < currentCard.DismantleActions.Length)
                     {
                         DismantleCardAction action = currentCard.DismantleActions[__instance.Index];
                         if (action != null)
@@ -44,7 +44,8 @@ namespace CstiDetailedCardProgress
                 if (texts.Count > 0)
                 {
                     actionTooltip.TooltipTitle = __instance.Title;
-                    actionTooltip.TooltipContent = Traverse.Create(__instance).Field("MyTooltip").Field("TooltipContent").GetValue<string>() + "\n<size=70%>" + texts.Join(delimiter: "\n") + "</size>";
+                    string orgContent = Traverse.Create(__instance).Field("MyTooltip").Field("TooltipContent").GetValue<string>();
+                    actionTooltip.TooltipContent = orgContent + (string.IsNullOrEmpty(orgContent) ? "" : "\n") + "<size=70%>" + texts.Join(delimiter: "\n") + "</size>";
                     actionTooltip.HoldText = Traverse.Create(__instance).Field("MyTooltip").Field("HoldText").GetValue<string>();
                     // Traverse.Create(__instance).Method("CancelTooltip").GetValue();
                     Tooltip.AddTooltip(actionTooltip);
@@ -71,8 +72,12 @@ namespace CstiDetailedCardProgress
             for(int i = 0; i < report.DropsInfo.Length; i++)
             {
                 float dropRate = report.GetDropPercent(i, withStat, withCard, withDuability);
-                if (dropRate < 0.00001) continue;
+                if (dropRate < 0.00001 && (!report.DropsInfo[i].IsSuccess || report.DropsInfo[i].FinalWeight < -10000)) continue;
                 texts.Add(FormatBasicEntry($"{dropRate:P2}", $"{report.DropsInfo[i].CollectionName}", indent: indent));
+                string dropCardTexts = report.DropsInfo[i].Drops.Where(c => c != null).GroupBy(c => new { c.CardType, c.CardName }, c => c, (k, cs) => new { name = k.CardName, count = cs.Count(), type = k.CardType })
+                    .Select(r => $"{ColorFloat(r.count)} ({r.type}){r.name}").Join();
+                if (!string.IsNullOrWhiteSpace(dropCardTexts))
+                    texts.Add(FormatBasicEntry($"<size=55%>{ new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.CardDrops", DefaultText = "Card Drops" }}</size>", "<size=55%>" + dropCardTexts + "</size>", indent: 2));
                 texts.Add(FormatBasicEntry($"{report.DropsInfo[i].FinalWeight}/{report.TotalValue}", new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.Weight", DefaultText = "Weight" }, indent: 2 + indent));
                 if (report.DropsInfo[i].BaseWeight != 0)
                 {

@@ -14,15 +14,18 @@ namespace CstiDetailedCardProgress
         {
             List<string> texts = new();
             List<string> stateModTexts = new();
-            
-            foreach (StatModifier statModifier in action.StatModifications)
+
+            if (action.StatModifications != null)
             {
-                stateModTexts.Add(FormatStatModifier(statModifier, indent: 2));
-            }
-            if (stateModTexts.Count > 0)
-            {
-                texts.Add(FormatBasicEntry(new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.StatModifier", DefaultText = "Stat Modifier" }, ""));
-                texts.Add(stateModTexts.Join(delimiter: "\n"));
+                foreach (StatModifier statModifier in action.StatModifications)
+                {
+                    stateModTexts.Add(FormatStatModifier(statModifier, indent: 2));
+                }
+                if (stateModTexts.Count > 0)
+                {
+                    texts.Add(FormatBasicEntry(new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.StatModifier", DefaultText = "Stat Modifier" }, ""));
+                    texts.Add(stateModTexts.Join(delimiter: "\n"));
+                }
             }
 
             List<string> cardModTexts = new();
