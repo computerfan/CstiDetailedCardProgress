@@ -35,7 +35,7 @@ namespace CstiDetailedCardProgress
                             if ((dropReport.DropsInfo == null || dropReport.DropsInfo.Length == 0) && action.ProducedCards != null && action.ProducedCards.Length > 0)
                             {
                                 dropReport = GM.GetCollectionDropsReport(action, currentCard, true);
-                                texts.Add(FormatCardDropList(dropReport, currentCard));
+                                texts.Add(FormatCardDropList(dropReport, currentCard, action: action));
                             }
                             texts.Add(FormatDismantleCardAction(action, currentCard));
                         }
@@ -67,7 +67,7 @@ namespace CstiDetailedCardProgress
             Tooltip.RemoveTooltip(actionTooltip);
         }
 
-        public static string FormatCardDropList(CollectionDropReport report, InGameCardBase fromCard, bool withStat = true,bool withCard = true, bool withDuability = true, int indent = 0)
+        public static string FormatCardDropList(CollectionDropReport report, InGameCardBase fromCard, bool withStat = true,bool withCard = true, bool withDuability = true, CardAction action = null, int indent = 0)
         {
             List<string> texts = new();
             for(int i = 0; i < report.DropsInfo.Length; i++)
@@ -76,13 +76,19 @@ namespace CstiDetailedCardProgress
                 if (report.DropsInfo.Length != 1 && dropRate < 0.00001 && (!report.DropsInfo[i].IsSuccess || report.DropsInfo[i].FinalWeight < -10000)) continue;
                 string dropCardTexts = report.DropsInfo[i].Drops.Where(c => c != null).GroupBy(c => new { c.CardType, c.CardName }, c => c, (k, cs) => new { name = k.CardName, count = cs.Count(), type = k.CardType })
                     .Select(r => $"{ColorFloat(r.count)} ({r.type}){r.name}").Join();
+                if (action != null && action.ProducedCards != null && action.ProducedCards[0].DropsLiquid)
+                {
+                    LiquidDrop currentLiquidDrop = action.ProducedCards[0].CurrentLiquidDrop;
+                    string liquidDropText = $"{FormatMinMaxValue(currentLiquidDrop.Quantity)} ({currentLiquidDrop.LiquidCard.CardType}){currentLiquidDrop.LiquidCard.CardName}";
+                    dropCardTexts = report.DropsInfo[i].Drops.Length == 0 ? liquidDropText : string.Join(", ", dropCardTexts, liquidDropText);
+                }
                 if (dropRate == 0 && report.DropsInfo.Length == 1)
                 {
-                    return FormatBasicEntry($"{ new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.CardDrops", DefaultText = "Card Drops" }}", dropCardTexts, indent: 0);
+                    return FormatBasicEntry($"{ new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.CardDrops", DefaultText = "Card Drops" }}", dropCardTexts, indent: indent);
                 }
                 texts.Add(FormatBasicEntry($"{dropRate:P2}", $"{report.DropsInfo[i].CollectionName}", indent: indent));
                 if (!string.IsNullOrWhiteSpace(dropCardTexts))
-                    texts.Add(FormatBasicEntry($"<size=55%>{ new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.CardDrops", DefaultText = "Card Drops" }}</size>", "<size=55%>" + dropCardTexts + "</size>", indent: 2));
+                    texts.Add(FormatBasicEntry($"<size=55%>{ new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.CardDrops", DefaultText = "Card Drops" }}</size>", "<size=55%>" + dropCardTexts + "</size>", indent: 2 + indent));
                 texts.Add(FormatBasicEntry($"{report.DropsInfo[i].FinalWeight}/{report.TotalValue}", new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.Weight", DefaultText = "Weight" }, indent: 2 + indent));
                 if (report.DropsInfo[i].BaseWeight != 0)
                 {
@@ -121,6 +127,21 @@ namespace CstiDetailedCardProgress
                     if (report.DropsInfo[i].DurabilitiesWeightMods.Special4Weight != 0)
                         texts.Add(FormatTooltipEntry(report.DropsInfo[i].DurabilitiesWeightMods.Special4Weight, $"{fromCard.CardModel.SpecialDurability4.CardStatName}", 4 + indent));
                 }
+                
+                if (report.DropsInfo[i].StatMods != null)
+                {
+                    List<string> stateModTexts = new();
+                    foreach (StatModifier statModifier in report.DropsInfo[i].StatMods)
+                    {
+                        stateModTexts.Add(FormatStatModifier(statModifier, indent: 4 + indent));
+                    }
+                    if (stateModTexts.Count > 0)
+                    {
+                        texts.Add(FormatBasicEntry(new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.StatModifier", DefaultText = "Stat Modifier" }, "", indent: 2 + indent));
+                        texts.Add(stateModTexts.Join(delimiter: "\n"));
+                    }
+                }
+
             }
             return $"{texts.Join(delimiter: "\n")}";
         }

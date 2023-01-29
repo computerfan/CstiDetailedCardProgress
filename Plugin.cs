@@ -86,7 +86,7 @@ namespace CstiDetailedCardProgress
                     {
                         CardOnCardAction cardOnCardAction = recipe.GetResult(cookingstatus.Card);
                         CollectionDropReport dropReport = GM.GetCollectionDropsReport(cardOnCardAction, __instance, false);
-                        texts.Add(Action.FormatCardDropList(dropReport, __instance, indent: 2));
+                        texts.Add("<size=70%>" + Action.FormatCardDropList(dropReport, __instance, indent: 2) + "</size>");
                     }
                 }
             }
