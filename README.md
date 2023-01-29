@@ -51,3 +51,8 @@ See <https://docs.bepinex.dev/v5.4.21/articles/user_guide/installation/index.htm
 ## 1.0.6
 - Shows liquid spoilage.
 - No longer shows stat modifiers from unknown sources.
+
+## 1.1.0
+- Shows StatModifier and CardStateChange for DismantleCardActions (e.g. changes in satiation when eating food).
+- Shows card drop, transform or destroy by DismantleCardActions.
+- Minor bug fix.
