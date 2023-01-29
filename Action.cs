@@ -16,15 +16,40 @@ namespace CstiDetailedCardProgress
         {
             if (Plugin.Enabled)
             {
+                List<string> texts = new();
+                GameManager GM = GameManager.Instance;
                 CollectionDropReport dropReport = Traverse.Create(__instance).Field("DropReport").GetValue<CollectionDropReport>();
-                if (dropReport.FromCard != null && dropReport.FromAction != null && dropReport.FromAction.HasSuccessfulDrop)
+                if (dropReport.FromCard != null && dropReport.FromAction != null && dropReport.FromAction.HasSuccessfulDrop && dropReport.DropsInfo.Length > 0)
+                {
+                    texts.Add(FormatCardDropList(dropReport, dropReport.FromCard));
+                }
+                InspectionPopup popup = __instance.GetComponentInParent<InspectionPopup>();
+                if (popup && popup.CurrentCard)
+                {
+                    InGameCardBase currentCard = popup.CurrentCard.ContainedLiquid == null ? popup.CurrentCard : popup.CurrentCard.ContainedLiquid;
+                    if (__instance.Index < currentCard.DismantleActions.Length)
+                    {
+                        DismantleCardAction action = currentCard.DismantleActions[__instance.Index];
+                        if (action != null)
+                        {
+                            if ((dropReport.DropsInfo == null || dropReport.DropsInfo.Length == 0) && action.ProducedCards != null && action.ProducedCards.Length > 0)
+                            {
+                                dropReport = GM.GetCollectionDropsReport(action, currentCard, true);
+                                texts.Add(FormatCardDropList(dropReport, currentCard));
+                            }
+                            texts.Add(FormatDismantleCardAction(action, currentCard));
+                        }
+                    }
+                }
+                if (texts.Count > 0)
                 {
                     actionTooltip.TooltipTitle = __instance.Title;
-                    actionTooltip.TooltipContent = Traverse.Create(__instance).Field("MyTooltip").Field("TooltipContent").GetValue<string>() + '\n' + FormatCardDropList(dropReport, dropReport.FromCard);
+                    actionTooltip.TooltipContent = Traverse.Create(__instance).Field("MyTooltip").Field("TooltipContent").GetValue<string>() + "\n<size=70%>" + texts.Join(delimiter: "\n") + "</size>";
                     actionTooltip.HoldText = Traverse.Create(__instance).Field("MyTooltip").Field("HoldText").GetValue<string>();
                     // Traverse.Create(__instance).Method("CancelTooltip").GetValue();
                     Tooltip.AddTooltip(actionTooltip);
                 }
+
             }
         }
 
@@ -87,7 +112,7 @@ namespace CstiDetailedCardProgress
                         texts.Add(FormatTooltipEntry(report.DropsInfo[i].DurabilitiesWeightMods.Special4Weight, $"{fromCard.CardModel.SpecialDurability4.CardStatName}", 4 + indent));
                 }
             }
-            return $"<size=75%>{texts.Join(delimiter: "\n")}</size>";
+            return $"{texts.Join(delimiter: "\n")}";
         }
     }
 }

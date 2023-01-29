@@ -23,3 +23,6 @@ CstiDetailedCardProgress.Recipe,,菜谱
 CstiDetailedCardProgress.Producing,,产生
 CstiDetailedCardProgress.d,,天
 CstiDetailedCardProgress.h,,时
+CstiDetailedCardProgress.LiquidQuantityChange,,液体量
+CstiDetailedCardProgress.StatModifier,,状态修正
+CstiDetailedCardProgress.CardStateChange,,卡牌状态变更
