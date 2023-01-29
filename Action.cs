@@ -73,10 +73,14 @@ namespace CstiDetailedCardProgress
             for(int i = 0; i < report.DropsInfo.Length; i++)
             {
                 float dropRate = report.GetDropPercent(i, withStat, withCard, withDuability);
-                if (dropRate < 0.00001 && (!report.DropsInfo[i].IsSuccess || report.DropsInfo[i].FinalWeight < -10000)) continue;
-                texts.Add(FormatBasicEntry($"{dropRate:P2}", $"{report.DropsInfo[i].CollectionName}", indent: indent));
+                if (report.DropsInfo.Length != 1 && dropRate < 0.00001 && (!report.DropsInfo[i].IsSuccess || report.DropsInfo[i].FinalWeight < -10000)) continue;
                 string dropCardTexts = report.DropsInfo[i].Drops.Where(c => c != null).GroupBy(c => new { c.CardType, c.CardName }, c => c, (k, cs) => new { name = k.CardName, count = cs.Count(), type = k.CardType })
                     .Select(r => $"{ColorFloat(r.count)} ({r.type}){r.name}").Join();
+                if (dropRate == 0 && report.DropsInfo.Length == 1)
+                {
+                    return FormatBasicEntry($"{ new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.CardDrops", DefaultText = "Card Drops" }}", dropCardTexts, indent: 0);
+                }
+                texts.Add(FormatBasicEntry($"{dropRate:P2}", $"{report.DropsInfo[i].CollectionName}", indent: indent));
                 if (!string.IsNullOrWhiteSpace(dropCardTexts))
                     texts.Add(FormatBasicEntry($"<size=55%>{ new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.CardDrops", DefaultText = "Card Drops" }}</size>", "<size=55%>" + dropCardTexts + "</size>", indent: 2));
                 texts.Add(FormatBasicEntry($"{report.DropsInfo[i].FinalWeight}/{report.TotalValue}", new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.Weight", DefaultText = "Weight" }, indent: 2 + indent));
