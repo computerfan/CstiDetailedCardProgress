@@ -41,11 +41,12 @@ namespace CstiDetailedCardProgress
                         }
                     }
                 }
-                if (texts.Count > 0)
+                string newContent = texts.Join(delimiter: "\n");
+                if (!string.IsNullOrWhiteSpace(newContent))
                 {
                     actionTooltip.TooltipTitle = __instance.Title;
                     string orgContent = Traverse.Create(__instance).Field("MyTooltip").Field("TooltipContent").GetValue<string>();
-                    actionTooltip.TooltipContent = orgContent + (string.IsNullOrEmpty(orgContent) ? "" : "\n") + "<size=70%>" + texts.Join(delimiter: "\n") + "</size>";
+                    actionTooltip.TooltipContent = orgContent + (string.IsNullOrEmpty(orgContent) ? "" : "\n") + "<size=70%>" + newContent + "</size>";
                     actionTooltip.HoldText = Traverse.Create(__instance).Field("MyTooltip").Field("HoldText").GetValue<string>();
                     // Traverse.Create(__instance).Method("CancelTooltip").GetValue();
                     Tooltip.AddTooltip(actionTooltip);

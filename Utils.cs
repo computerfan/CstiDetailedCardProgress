@@ -59,6 +59,14 @@ namespace CstiDetailedCardProgress
                 if (stateChange.Special4Change.magnitude != 0)
                     cardModTexts.Add(FormatBasicEntry(FormatMinMaxValue(stateChange.Special4Change), string.IsNullOrEmpty(fromCard.CardModel.SpecialDurability4.CardStatName) ? "SpecialDurability4" : fromCard.CardModel.SpecialDurability4.CardStatName, indent: 2));
             }
+            else if (stateChange.ModType == CardModifications.Transform)
+            {
+                cardModTexts.Add(FormatBasicEntry(new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.TransformInto", DefaultText = "Transform into" }, $"{stateChange.TransformInto.CardName}", indent: 2));
+            }
+            else if (stateChange.ModType == CardModifications.Destroy)
+            {
+                cardModTexts.Add(FormatBasicEntry(new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Destroy", DefaultText = "Destroy" }, fromCard.CardModel.CardName, "red", indent: 2));
+            }
             if (cardModTexts.Count > 0)
             {
                 texts.Add(FormatBasicEntry(new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.CardStateChange", DefaultText = "Card State Change" }, ""));
