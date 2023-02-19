@@ -1,5 +1,9 @@
-﻿using BepInEx;
+﻿#if MELON_LOADER
+using MelonLoader;
+#else
+using BepInEx;
 using BepInEx.Configuration;
+#endif
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -9,10 +13,19 @@ using UnityEngine;
 using static CstiDetailedCardProgress.Utils;
 
 
+#if MELON_LOADER
+[assembly: MelonInfo(typeof(CstiDetailedCardProgress.Plugin), CstiDetailedCardProgress.PluginInfo.PLUGIN_NAME, CstiDetailedCardProgress.PluginInfo.PLUGIN_VERSION, "computerfan")]
+[assembly: MelonGame("WinterSpring Games", "Card Survival - Tropical Island")]
+#endif
+
 namespace CstiDetailedCardProgress
 {
+#if MELON_LOADER
+    public class Plugin : MelonMod
+#else
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin
+#endif
     {
         public static TooltipText MyTooltip = new();
         public static InGameStat inGamePlayerWeight;
@@ -20,6 +33,19 @@ namespace CstiDetailedCardProgress
         public static KeyCode HotKey;
         public static bool RecipesShowTargetDuration;
 
+#if MELON_LOADER
+        public override void OnInitializeMelon()
+        {
+            Enabled = true;
+            HotKey = KeyCode.F2;
+            RecipesShowTargetDuration = false;
+            HarmonyLib.Harmony.CreateAndPatchAll(typeof(Plugin));
+            HarmonyLib.Harmony.CreateAndPatchAll(typeof(Stat));
+            HarmonyLib.Harmony.CreateAndPatchAll(typeof(Action));
+            HarmonyLib.Harmony.CreateAndPatchAll(typeof(Locale));
+            LoggerInstance.Msg($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
+        }
+#else
         private void Awake()
         {
             Enabled = Config.Bind("General", nameof(Enabled), true, "If true, will show the tool tips.").Value;
@@ -34,8 +60,7 @@ namespace CstiDetailedCardProgress
 
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
-
-
+#endif
 
         [HarmonyPostfix, HarmonyPatch(typeof(GameManager), "Update")]
         public static void GameMangerUpdatePatch()

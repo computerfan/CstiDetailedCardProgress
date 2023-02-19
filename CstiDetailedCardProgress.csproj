@@ -1,57 +1,78 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net462</TargetFramework>
-    <AssemblyName>CstiDetailedCardProgress</AssemblyName>
-    <Description>CSTI Detailed Card Progress Mod</Description>
-    <Version>1.1.0</Version>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>latest</LangVersion>
-    <PackageId>space.cfan.CstiDetailedCardProgress</PackageId>
-    <Authors>computerfan</Authors>
-    <Copyright>MIT License</Copyright>
-    <Product>CSTIDetailedCardProgressMod</Product>
-    <Company />
-	<GameAssemblyPath Condition="'$(GameAssemblyPath)' == ''">..\..\Card Survival - Tropical Island_Data\Managed</GameAssemblyPath>
-	<DebugType>Full</DebugType>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net462</TargetFramework>
+		<AssemblyName>CstiDetailedCardProgress</AssemblyName>
+		<Description>CSTI Detailed Card Progress Mod</Description>
+		<Version>1.1.0</Version>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>latest</LangVersion>
+		<PackageId>space.cfan.CstiDetailedCardProgress</PackageId>
+		<Authors>computerfan</Authors>
+		<Copyright>MIT License</Copyright>
+		<Product>CSTIDetailedCardProgressMod</Product>
+		<Company />
+		<GameAssemblyPath Condition="'$(GameAssemblyPath)' == ''">..\..\Card Survival - Tropical Island_Data\Managed</GameAssemblyPath>
+		<MelonLoaderAssemblyPath Condition="'$(MelonLoaderAssemblyPath)' == ''">..\MelonLoader</MelonLoaderAssemblyPath>
+		<DebugType>Full</DebugType>
+		<Configurations>Debug;Release;Release-MelonLoader;Debug-MelonLoader</Configurations>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="locale\简体中文.csv" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-MelonLoader|AnyCPU'">
+		<DefineConstants>TRACE;MELON_LOADER</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
-    <PackageReference Include="BepInEx.Core" Version="5.4.17" />
-    <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
-	<PackageReference Include="UnityEngine.Modules" Version="2019.4.35" IncludeAssets="compile" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-MelonLoader|AnyCPU'">
+	  <DefineConstants>TRACE;MELON_LOADER</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>$(GameAssemblyPath)\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>$(GameAssemblyPath)\Unity.TextMeshPro.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>$(GameAssemblyPath)\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>$(GameAssemblyPath)\UnityEngine.AssetBundleModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>$(GameAssemblyPath)\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>$(GameAssemblyPath)\UnityEngine.TextRenderingModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>$(GameAssemblyPath)\UnityEngine.UI.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="locale\简体中文.csv" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+		<PackageReference Include="BepInEx.Core" Version="5.4.17" />
+		<PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
+		<PackageReference Include="UnityEngine.Modules" Version="2019.4.35" IncludeAssets="compile" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Assembly-CSharp">
+			<HintPath>$(GameAssemblyPath)\Assembly-CSharp.dll</HintPath>
+		</Reference>
+
+		<Reference Include="Unity.TextMeshPro">
+			<HintPath>$(GameAssemblyPath)\Unity.TextMeshPro.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine">
+			<HintPath>$(GameAssemblyPath)\UnityEngine.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.AssetBundleModule">
+			<HintPath>$(GameAssemblyPath)\UnityEngine.AssetBundleModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath>$(GameAssemblyPath)\UnityEngine.CoreModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.TextRenderingModule">
+			<HintPath>$(GameAssemblyPath)\UnityEngine.TextRenderingModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UI">
+			<HintPath>$(GameAssemblyPath)\UnityEngine.UI.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release-MelonLoader|AnyCPU'">
+		<Reference Include="MelonLoader">
+			<HintPath>$(MelonLoaderAssemblyPath)\MelonLoader.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug-MelonLoader|AnyCPU'">
+		<Reference Include="MelonLoader">
+			<HintPath>$(MelonLoaderAssemblyPath)\MelonLoader.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 </Project>
