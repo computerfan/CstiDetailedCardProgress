@@ -74,7 +74,7 @@ namespace CstiDetailedCardProgress
         [HarmonyPrefix, HarmonyPatch(typeof(InGameCardBase), "OnHoverEnter")]
         public static void OnHoverEnterPatch(InGameCardBase __instance)
         {
-            if (!Enabled || GameManager.DraggedCard || __instance.IsPinned) return;
+            if (!Enabled || __instance.IsPinned) return;
             CardData CardModel = __instance.CardModel;
             if (!CardModel) return;
             GraphicsManager GraphicsM = Traverse.Create(__instance).Field("GraphicsM").GetValue<GraphicsManager>();
@@ -90,7 +90,32 @@ namespace CstiDetailedCardProgress
             List<string> BaseEvaporationRate = new();
             List<string> texts = new();
 
-            if(CardModel.CardType == CardTypes.Location && __instance.IsCooking())
+            if (GameManager.DraggedCard)
+            {
+                InGameDraggableCard droppedCard = GameManager.DraggedCard;
+                if (!droppedCard || !droppedCard.CanBeDragged) return;
+                CardOnCardAction action = Traverse.Create(__instance).Field("PossibleAction").GetValue<CardOnCardAction>();
+                if (action == null) return;
+                InGameCardBase currentCard = __instance.ContainedLiquid ?? __instance;
+                if (action.ProducedCards != null)
+                {
+                    CollectionDropReport dropReport = GM.GetCollectionDropsReport(action, currentCard, true);
+                    texts.Add(Action.FormatCardDropList(dropReport, currentCard, action: action));
+                }
+                texts.Add(FormatCardOnCardAction(action, currentCard, droppedCard));
+                if (texts.Count > 0)
+                {
+                    TooltipText orgTooltip = Traverse.Create(__instance).Field("MyTooltip").GetValue<TooltipText>();
+                    MyTooltip.TooltipTitle = __instance.Title;
+                    MyTooltip.TooltipContent = (string.IsNullOrEmpty(__instance.Content) ? "" : (__instance.Content + "\n")) + "<size=75%>" + texts.Join(delimiter: "\n") + "</size>";
+                    MyTooltip.HoldText = orgTooltip.HoldText;
+                    MyTooltip.Priority = orgTooltip.Priority + 10;
+                    Tooltip.AddTooltip(MyTooltip);
+                }
+                return;
+            }
+
+            if (CardModel.CardType == CardTypes.Location && __instance.IsCooking())
             {
                 foreach(CookingCardStatus cookingstatus in __instance.CookingCards)
                 {

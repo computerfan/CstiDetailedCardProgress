@@ -24,23 +24,34 @@ namespace CstiDetailedCardProgress
                     texts.Add(FormatCardDropList(dropReport, dropReport.FromCard));
                 }
                 InspectionPopup popup = __instance.GetComponentInParent<InspectionPopup>();
+                ExplorationPopup explorationPopup = __instance.GetComponentInParent<ExplorationPopup>();
+                InGameCardBase currentCard = null;
+                DismantleCardAction action = null;
                 if (popup && popup.CurrentCard)
                 {
-                    InGameCardBase currentCard = popup.CurrentCard.ContainedLiquid == null ? popup.CurrentCard : popup.CurrentCard.ContainedLiquid;
+                    currentCard = popup.CurrentCard.ContainedLiquid ?? popup.CurrentCard;
                     if (currentCard.CardModel.CardType != CardTypes.Blueprint && __instance.Index > -1 && __instance.Index < currentCard.DismantleActions.Length)
                     {
-                        DismantleCardAction action = currentCard.DismantleActions[__instance.Index];
-                        if (action != null)
-                        {
-                            if ((dropReport.DropsInfo == null || dropReport.DropsInfo.Length == 0) && action.ProducedCards != null && action.ProducedCards.Length > 0)
-                            {
-                                dropReport = GM.GetCollectionDropsReport(action, currentCard, true);
-                                texts.Add(FormatCardDropList(dropReport, currentCard, action: action));
-                            }
-                            texts.Add(FormatDismantleCardAction(action, currentCard));
-                        }
+                        action = currentCard.DismantleActions[__instance.Index];
                     }
                 }
+                else if (explorationPopup && explorationPopup.ExplorationCard)
+                {
+                    if (__instance.name == "Button" || Traverse.Create(explorationPopup).Field("CurrentPhase").GetValue<int>() != 0) return;
+                    currentCard = explorationPopup.ExplorationCard;
+                    action = currentCard.CardModel.DismantleActions[0];
+                }
+
+                if (action != null)
+                {
+                    if ((dropReport.DropsInfo == null || dropReport.DropsInfo.Length == 0) && action.ProducedCards != null && action.ProducedCards.Length > 0)
+                    {
+                        dropReport = GM.GetCollectionDropsReport(action, currentCard, true);
+                        texts.Add(FormatCardDropList(dropReport, currentCard, action: action));
+                    }
+                    texts.Add(FormatCardAction(action, currentCard));
+                }
+
                 string newContent = texts.Join(delimiter: "\n");
                 if (!string.IsNullOrWhiteSpace(newContent))
                 {
