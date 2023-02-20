@@ -15,10 +15,11 @@ namespace CstiDetailedCardProgress
 {
     class TooltipMod
     {
+        public static ContentSizeFitter fitter;
         [HarmonyPostfix, HarmonyPatch(typeof(Tooltip), "Awake")]
         public static void TooltipAwakePatch(Tooltip __instance)
         {
-            ContentSizeFitter fitter = __instance.GetComponentInParent<ContentSizeFitter>();
+            fitter = __instance.GetComponentInParent<ContentSizeFitter>();
             fitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
             TextMeshProUGUI content = __instance.TooltipContent;
             content.overflowMode = TextOverflowModes.Page;
@@ -27,6 +28,10 @@ namespace CstiDetailedCardProgress
         [HarmonyPostfix, HarmonyPatch(typeof(Tooltip), "LateUpdate")]
         public static void TooltipLateUpdatePatch(Tooltip __instance)
         {
+            if(fitter == null || fitter.IsDestroyed())
+            {
+                fitter = __instance.GetComponentInParent<ContentSizeFitter>();
+            }
             if (Plugin.Enabled && __instance.TooltipCount > 0)
             {
                 RectTransform ParentRect = __instance.ScreenRect;

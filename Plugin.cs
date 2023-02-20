@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using static CstiDetailedCardProgress.Utils;
 
 
@@ -77,6 +78,7 @@ namespace CstiDetailedCardProgress
             if (Input.GetKeyDown(HotKey))
             {
                 Enabled = !Enabled;
+                TooltipMod.fitter.verticalFit = ~ TooltipMod.fitter.verticalFit & ContentSizeFitter.FitMode.PreferredSize;
             }
         }
 
