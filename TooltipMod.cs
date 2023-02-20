@@ -35,10 +35,10 @@ namespace CstiDetailedCardProgress
                 rect.sizeDelta = new Vector2(rect.sizeDelta.x, Mathf.Min(ParentRect.rect.height * 0.95f, lg.preferredHeight));
                 TextMeshProUGUI content = __instance.TooltipContent;
                 int totalpages = content.textInfo.pageCount;
-                if (Input.GetKeyDown(KeyCode.RightBracket) && content.pageToDisplay < totalpages){
+                if (Input.GetKeyDown(Plugin.TooltipNextPageHotKey) && content.pageToDisplay < totalpages){
                     content.pageToDisplay++;
                 }
-                else if (Input.GetKeyDown(KeyCode.LeftBracket) && content.pageToDisplay > 1) {
+                else if (Input.GetKeyDown(Plugin.TooltipPreviousPageHotKey) && content.pageToDisplay > 1) {
                     content.pageToDisplay--; 
                 }
             }

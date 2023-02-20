@@ -33,6 +33,8 @@ namespace CstiDetailedCardProgress
         public static KeyCode HotKey;
         public static bool RecipesShowTargetDuration;
         public static bool HideImpossibleDropSet;
+        public static KeyCode TooltipNextPageHotKey;
+        public static KeyCode TooltipPreviousPageHotKey;
 
 #if MELON_LOADER
         public override void OnInitializeMelon()
@@ -55,6 +57,8 @@ namespace CstiDetailedCardProgress
             HotKey = Config.Bind("General", nameof(HotKey), KeyCode.F2, "The key to enable and disable the tool tips").Value;
             RecipesShowTargetDuration = Config.Bind("Tweak", nameof(RecipesShowTargetDuration), false, "If true, cookers like traps will show exact cooking duration instead of a range.").Value;
             HideImpossibleDropSet = Config.Bind("Tweak", nameof(HideImpossibleDropSet), true, "If true, impossible drop sets will be hidden.").Value;
+            TooltipNextPageHotKey = Config.Bind("Tooltip", nameof(TooltipNextPageHotKey), KeyCode.RightBracket, "The key to show next page of the tool tip.").Value;
+            TooltipPreviousPageHotKey = Config.Bind("Tooltip", nameof(TooltipPreviousPageHotKey), KeyCode.LeftBracket, "The key to show previous page of the tool tip.").Value;
 
             // Plugin startup logic
             Harmony.CreateAndPatchAll(typeof(Plugin));
