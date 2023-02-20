@@ -32,6 +32,7 @@ namespace CstiDetailedCardProgress
         public static bool Enabled;
         public static KeyCode HotKey;
         public static bool RecipesShowTargetDuration;
+        public static bool HideImpossibleDropSet;
 
 #if MELON_LOADER
         public override void OnInitializeMelon()
@@ -39,10 +40,12 @@ namespace CstiDetailedCardProgress
             Enabled = true;
             HotKey = KeyCode.F2;
             RecipesShowTargetDuration = false;
+            HideImpossibleDropSet = true;
             HarmonyLib.Harmony.CreateAndPatchAll(typeof(Plugin));
             HarmonyLib.Harmony.CreateAndPatchAll(typeof(Stat));
             HarmonyLib.Harmony.CreateAndPatchAll(typeof(Action));
             HarmonyLib.Harmony.CreateAndPatchAll(typeof(Locale));
+            HarmonyLib.Harmony.CreateAndPatchAll(typeof(TooltipMod));
             LoggerInstance.Msg($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
 #else
@@ -51,12 +54,14 @@ namespace CstiDetailedCardProgress
             Enabled = Config.Bind("General", nameof(Enabled), true, "If true, will show the tool tips.").Value;
             HotKey = Config.Bind("General", nameof(HotKey), KeyCode.F2, "The key to enable and disable the tool tips").Value;
             RecipesShowTargetDuration = Config.Bind("Tweak", nameof(RecipesShowTargetDuration), false, "If true, cookers like traps will show exact cooking duration instead of a range.").Value;
+            HideImpossibleDropSet = Config.Bind("Tweak", nameof(HideImpossibleDropSet), true, "If true, impossible drop sets will be hidden.").Value;
 
             // Plugin startup logic
             Harmony.CreateAndPatchAll(typeof(Plugin));
             Harmony.CreateAndPatchAll(typeof(Stat));
             Harmony.CreateAndPatchAll(typeof(Action));
             Harmony.CreateAndPatchAll(typeof(Locale));
+            Harmony.CreateAndPatchAll(typeof(TooltipMod));
 
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
