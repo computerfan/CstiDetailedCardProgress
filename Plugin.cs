@@ -571,6 +571,7 @@ namespace CstiDetailedCardProgress
         public static void InGameCardBaseOnHoverExitPatch(InGameCardBase __instance)
         {
             Tooltip.RemoveTooltip(MyTooltip);
+            Tooltip.Instance.TooltipContent.pageToDisplay = 1;
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(EquipmentButton), "Update")]

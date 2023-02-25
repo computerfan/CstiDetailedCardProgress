@@ -96,12 +96,14 @@ namespace CstiDetailedCardProgress
         public static void DismantleActionButtonOnHoverExitPatch(DismantleActionButton __instance)
         {
             Tooltip.RemoveTooltip(actionTooltip);
+            Tooltip.Instance.TooltipContent.pageToDisplay = 1;
         }
 
         [HarmonyPostfix, HarmonyPatch(typeof(DismantleActionButton), "OnDisable")]
         public static void DismantleActionButtonOnDisablePatch(DismantleActionButton __instance)
         {
             Tooltip.RemoveTooltip(actionTooltip);
+            Tooltip.Instance.TooltipContent.pageToDisplay = 1;
         }
 
         public static string FormatCardDropList(CollectionDropReport report, InGameCardBase fromCard, bool withStat = true,bool withCard = true, bool withDuability = true, CardAction action = null, int indent = 0)
