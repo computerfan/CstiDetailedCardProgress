@@ -5,17 +5,6 @@ This mod shows card status and progress related details in tooltip.
 ![Preview](pic/screenshot1.png)
 
 # Usage
-## Settings (Optional)
-
-The configuration file can be found at /BepInEx/config/CstiDetailedCardProgress.cfg
-
-|Name|Default|Description|
-|--|--|--|
-|Enabled|true|If set to true, will show the details tooltips|
-|HotKey|F2|The key to enable and disable the tool tips|
-|RecipesShowTargetDuration|false|If true, cookers like traps will show exact cooking duration instead of a range.|
-
-__Toggle Note__: When using the hotkey to enable/disable the detailed tooltips, the tooltips will not be updated until the user moves the mouse off of a card.
 
 ## Install BepInEx
 
@@ -28,6 +17,21 @@ See <https://docs.bepinex.dev/v5.4.21/articles/user_guide/installation/index.htm
 - Download latest release from <https://github.com/computerfan/CstiDetailedCardProgress/releases>. 
 
 - Extract `CstiDetailedCardProgress.dll` to `BepInEx/plugins folder`.
+
+## Settings (Optional)
+
+The configuration file can be found at /BepInEx/config/CstiDetailedCardProgress.cfg
+
+|Name|Default|Description|
+|--|--|--|
+|Enabled|true|If set to true, will show the details tooltips|
+|HotKey|F2|The key to enable and disable the tool tips|
+|RecipesShowTargetDuration|false|If true, cookers like traps will show exact cooking duration instead of a range.|
+|HideImpossibleDropSet|true|If true, impossible drop sets will be hidden.|
+|TooltipNextPageHotKey|RightBracket|The key to show next page of the tool tip.|
+|TooltipPreviousPageHotKey|LeftBracket|The key to show previous page of the tool tip.|
+
+__Toggle Note__: When using the hotkey to enable/disable the detailed tooltips, the tooltips will not be updated until the user moves the mouse off of a card.
 
 # Change Log
 
@@ -56,3 +60,9 @@ See <https://docs.bepinex.dev/v5.4.21/articles/user_guide/installation/index.htm
 - Shows StatModifier and CardStateChange for DismantleCardActions (e.g. changes in satiation when eating food).
 - Shows card drop, transform or destroy by DismantleCardActions.
 - Minor bug fix.
+
+## 1.1.1
+- Long tootip texts can now be shown in multiple pages, use [ and ] keys to turn pages.
+- Shows changes made by CardOnCardAction (e.g. results of fishing with a fishing rod).
+- Shows possible results of scene exploration.
+- New config entry HideImpossibleDropSet. Set to false to show all card drops even with a chance of %0.

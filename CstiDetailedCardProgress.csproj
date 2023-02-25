@@ -4,18 +4,20 @@
 		<TargetFramework>net462</TargetFramework>
 		<AssemblyName>CstiDetailedCardProgress</AssemblyName>
 		<Description>CSTI Detailed Card Progress Mod</Description>
-		<Version>1.1.0</Version>
+		<Version>1.1.1</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 		<PackageId>space.cfan.CstiDetailedCardProgress</PackageId>
 		<Authors>computerfan</Authors>
-		<Copyright>MIT License</Copyright>
+		<Copyright>MIT License Copyright © 2022 $(Authors)</Copyright>
 		<Product>CSTIDetailedCardProgressMod</Product>
 		<Company />
 		<GameAssemblyPath Condition="'$(GameAssemblyPath)' == ''">..\..\Card Survival - Tropical Island_Data\Managed</GameAssemblyPath>
 		<MelonLoaderAssemblyPath Condition="'$(MelonLoaderAssemblyPath)' == ''">..\MelonLoader</MelonLoaderAssemblyPath>
 		<DebugType>Full</DebugType>
 		<Configurations>Debug;Release;Release-MelonLoader;Debug-MelonLoader</Configurations>
+		<PackageProjectUrl>https://github.com/computerfan/CstiDetailedCardProgress</PackageProjectUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-MelonLoader|AnyCPU'">
@@ -25,6 +27,7 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-MelonLoader|AnyCPU'">
 	  <DefineConstants>TRACE;MELON_LOADER</DefineConstants>
+	  <Optimize>false</Optimize>
 	</PropertyGroup>
 
 	<ItemGroup>
