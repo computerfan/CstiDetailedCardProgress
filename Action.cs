@@ -39,7 +39,33 @@ namespace CstiDetailedCardProgress
                 {
                     if (__instance.name == "Button" || Traverse.Create(explorationPopup).Field("CurrentPhase").GetValue<int>() != 0) return;
                     currentCard = explorationPopup.ExplorationCard;
-                    action = currentCard.CardModel.DismantleActions[0];
+                    action = currentCard.CardModel?.DismantleActions[0];
+                    if (action != null)
+                    {
+                        if (currentCard.ExplorationData != null)
+                        {
+                            texts.Add(FormatBasicEntry($"{currentCard.ExplorationData.CurrentExploration:P2}", new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.CurrentExploration", DefaultText = "Current Exploration" }));
+                        }
+                        texts.Add(FormatBasicEntry(ColorFloat(action.ExplorationValue, true), new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.ExplorationValue", DefaultText = "Explored" }));
+                        currentCard.CardModel?.ExplorationResults?
+                            .Where(r => currentCard.ExplorationData.CurrentExploration < r.TriggerValue && currentCard.ExplorationData.CurrentExploration + action.ExplorationValue >= r.TriggerValue)
+                            .Select(r => r.Action)
+                            .Do(exploreAction =>
+                            {
+                                texts.Add(FormatBasicEntry(exploreAction.ActionName, ""));
+                                string dropList = FormatCardDropList(GM.GetCollectionDropsReport(exploreAction, currentCard, false), currentCard, action: action, indent: 2);
+                                if (!string.IsNullOrWhiteSpace(dropList))
+                                {
+                                    texts.Add(dropList);
+                                }
+                                string actionText = FormatCardAction(exploreAction, currentCard, indent: 2);
+                                if (!string.IsNullOrWhiteSpace(actionText))
+                                {
+                                    texts.Add(actionText);
+                                }
+                            });
+                        texts.Add(FormatBasicEntry(FormatMinMaxValue(action.MinMaxExplorationDrops), new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.ExplorationDropsCount", DefaultText = "Exploration Drops Count" }));
+                    }
                 }
 
                 if (action != null)

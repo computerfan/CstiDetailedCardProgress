@@ -143,9 +143,12 @@ namespace CstiDetailedCardProgress
             return "<color=\"yellow\">";
         }
 
-        public static string ColorFloat(float num)
+        public static string ColorFloat(float num, bool asPercent = false)
         {
-            return $"{ColorTagFromFloat(num)}{num,-3:+0.##;-0.##;+0}</color>";
+            if (asPercent)
+                return $"{ColorTagFromFloat(num)}{num,-3:+0.##%;-0.##%;+0}</color>";
+            else
+                return $"{ColorTagFromFloat(num)}{num,-3:+0.##;-0.##;+0}</color>";
         }
 
         public static string FormatWeight(float weight)
