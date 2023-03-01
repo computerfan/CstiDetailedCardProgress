@@ -66,3 +66,8 @@ __Toggle Note__: When using the hotkey to enable/disable the detailed tooltips, 
 - Shows changes made by CardOnCardAction (e.g. results of fishing with a fishing rod).
 - Shows possible results of scene exploration.
 - New config entry HideImpossibleDropSet. Set to false to show all card drops even with a chance of %0.
+
+## 1.1.2
+- Fix hold text and bar not displaying when have a card interaction.
+- Shows state changes when build or deconstruct blueprints.
+- Should work safely with game version 1.04.
