@@ -40,7 +40,7 @@ namespace CstiDetailedCardProgress
 
             if (action.StatModifications != null)
             {
-                foreach (StatModifier statModifier in action.StatModifications)
+                foreach (StatModifier statModifier in action.AllStatModifiers)
                 {
                     stateModTexts.Add(FormatStatModifier(statModifier, indent: indent + 2));
                 }
