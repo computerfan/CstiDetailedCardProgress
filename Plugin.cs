@@ -37,6 +37,9 @@ namespace CstiDetailedCardProgress
         public static KeyCode TooltipNextPageHotKey;
         public static KeyCode TooltipPreviousPageHotKey;
 
+        public static InGameCardBase lastDragHoverCard;
+        public static string lastDragHoverCardOrgTooltipContent;
+
 #if MELON_LOADER
         public override void OnInitializeMelon()
         {
@@ -105,6 +108,12 @@ namespace CstiDetailedCardProgress
             {
                 InGameDraggableCard droppedCard = GameManager.DraggedCard;
                 if (!droppedCard || !droppedCard.CanBeDragged) return;
+                if (lastDragHoverCard == __instance) return;
+                else if (lastDragHoverCard != null) {
+                    TooltipText orgTooltip = Traverse.Create(lastDragHoverCard).Field("MyTooltip").GetValue<TooltipText>();
+                    if (orgTooltip != null) orgTooltip.TooltipContent = lastDragHoverCardOrgTooltipContent;
+                    lastDragHoverCard = null;
+                }
                 CardOnCardAction action = Traverse.Create(__instance).Field("PossibleAction").GetValue<CardOnCardAction>();
                 if (action == null) return;
                 InGameCardBase currentCard = __instance.ContainedLiquid ?? __instance;
@@ -117,12 +126,11 @@ namespace CstiDetailedCardProgress
                 if (texts.Count > 0)
                 {
                     TooltipText orgTooltip = Traverse.Create(__instance).Field("MyTooltip").GetValue<TooltipText>();
-                    MyTooltip.TooltipTitle = __instance.Title;
-                    MyTooltip.TooltipContent = (string.IsNullOrEmpty(__instance.Content) ? "" : (__instance.Content + "\n")) + "<size=75%>" + texts.Join(delimiter: "\n") + "</size>";
-                    MyTooltip.HoldText = orgTooltip.HoldText;
-                    MyTooltip.Priority = orgTooltip.Priority + 10;
-                    Tooltip.AddTooltip(MyTooltip);
+                    lastDragHoverCardOrgTooltipContent = __instance.Content;
+                    lastDragHoverCard = __instance;
+                    orgTooltip.TooltipContent = (string.IsNullOrEmpty(__instance.Content) ? "" : (__instance.Content + "\n")) + "<size=75%>" + texts.Join(delimiter: "\n") + "</size>";
                 }
+                
                 return;
             }
 
