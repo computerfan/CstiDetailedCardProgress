@@ -582,6 +582,12 @@ namespace CstiDetailedCardProgress
             Tooltip.Instance.TooltipContent.pageToDisplay = 1;
         }
 
+        [HarmonyPrefix, HarmonyPatch(typeof(InGameDraggableCard), "OnEndDrag")]
+        public static void InGameDraggableCardOnEndDragPatch(InGameDraggableCard __instance)
+        {
+            lastDragHoverCard = null;
+        }
+
         [HarmonyPostfix, HarmonyPatch(typeof(EquipmentButton), "Update")]
         public static void EquipmentButtonUpdatePatch(EquipmentButton __instance)
         {
