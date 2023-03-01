@@ -30,7 +30,17 @@ namespace CstiDetailedCardProgress
                 if (popup && popup.CurrentCard)
                 {
                     currentCard = popup.CurrentCard.ContainedLiquid ?? popup.CurrentCard;
-                    if (currentCard.CardModel.CardType != CardTypes.Blueprint && __instance.Index > -1 && __instance.Index < currentCard.DismantleActions.Length)
+                    if (currentCard.IsBlueprintInstance)
+                    {
+                        if (__instance.Index == -2)
+                        {
+                            action = Traverse.Create(popup).Field("CurrentBuildAction").GetValue<DismantleCardAction>();
+                        }
+                        else if (__instance.Index == -1) {
+                            action = Traverse.Create(popup).Field("CurrentDeconstructAction").GetValue<DismantleCardAction>();
+                        }
+                    }
+                    else if (__instance.Index > -1 && __instance.Index < currentCard.DismantleActions.Length)
                     {
                         action = currentCard.DismantleActions[__instance.Index];
                     }
@@ -123,6 +133,7 @@ namespace CstiDetailedCardProgress
                 }
                 if (dropRate == 0 && report.DropsInfo.Length == 1)
                 {
+                    if (string.IsNullOrWhiteSpace(dropCardTexts)) return "";
                     return FormatBasicEntry($"{ new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.CardDrops", DefaultText = "Card Drops" }}", dropCardTexts, indent: indent);
                 }
                 texts.Add(FormatBasicEntry($"{dropRate:P2}", $"{report.DropsInfo[i].CollectionName}", indent: indent));
