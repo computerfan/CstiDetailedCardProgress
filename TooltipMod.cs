@@ -20,7 +20,7 @@ namespace CstiDetailedCardProgress
         public static void TooltipAwakePatch(Tooltip __instance)
         {
             fitter = __instance.GetComponentInParent<ContentSizeFitter>();
-            fitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
+            if (Plugin.Enabled) fitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
             TextMeshProUGUI content = __instance.TooltipContent;
             content.overflowMode = TextOverflowModes.Page;
         }
@@ -38,6 +38,8 @@ namespace CstiDetailedCardProgress
                 VerticalLayoutGroup lg = __instance.GetComponent<VerticalLayoutGroup>();
                 RectTransform rect = __instance.GetComponent<RectTransform>();
                 rect.sizeDelta = new Vector2(rect.sizeDelta.x, Mathf.Min(ParentRect.rect.height * 0.95f, lg.preferredHeight));
+                TextMeshProUGUI title = __instance.TooltipTitle;
+                Traverse.Create(title).Field("m_minHeight").SetValue(title.preferredHeight);
                 TextMeshProUGUI content = __instance.TooltipContent;
                 int totalpages = content.textInfo.pageCount;
                 if (Input.GetKeyDown(Plugin.TooltipNextPageHotKey) && content.pageToDisplay < totalpages){
