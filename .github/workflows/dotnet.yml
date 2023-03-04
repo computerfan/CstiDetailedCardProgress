@@ -50,7 +50,8 @@ jobs:
         $projectPath = "$env:projectName.csproj"
         $outputPath = "$env:outputPath"
         $GameAssemblyPath = "$env:gameAssemblyPath"
-        dotnet build $projectPath --configuration Release /p:GameAssemblyPath=$GameAssemblyPath /p:Version=${{steps.get-version.outputs.version}} --output $outputPath
+        $BepInExPluginVersion = "${{steps.get-version.outputs.version}}" -replace '-([0-9]+).(.+)', ''
+        dotnet build $projectPath --configuration Release /p:GameAssemblyPath=$GameAssemblyPath /p:Version=${{steps.get-version.outputs.version}} /p:BepInExPluginVersion=$BepInExPluginVersion --output $outputPath
     - name: Copy artifact
       shell: pwsh
       run: |
