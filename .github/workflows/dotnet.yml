@@ -66,5 +66,5 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: CstiDetailedCardProgress-${{steps.get-version.outputs.version}}.zip
+        name: CstiDetailedCardProgress-${{steps.get-version.outputs.version}}
         path: ./artifact/
