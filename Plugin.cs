@@ -119,7 +119,7 @@ namespace CstiDetailedCardProgress
                 if (LastDragHoverCard != null)
                 {
                     TooltipText orgTooltip =
-                        Traverse.Create(LastDragHoverCard).Field("myTooltip").GetValue<TooltipText>();
+                        Traverse.Create(LastDragHoverCard).Field("MyTooltip").GetValue<TooltipText>();
                     if (orgTooltip != null) orgTooltip.TooltipContent = LastDragHoverCardOrgTooltipContent;
                     LastDragHoverCard = null;
                 }
@@ -137,7 +137,7 @@ namespace CstiDetailedCardProgress
                 texts.Add(FormatCardOnCardAction(action, currentCard, droppedCard));
                 if (texts.Count > 0)
                 {
-                    TooltipText orgTooltip = Traverse.Create(__instance).Field("myTooltip").GetValue<TooltipText>();
+                    TooltipText orgTooltip = Traverse.Create(__instance).Field("MyTooltip").GetValue<TooltipText>();
                     LastDragHoverCardOrgTooltipContent = __instance.Content;
                     LastDragHoverCard = __instance;
                     orgTooltip.TooltipContent =
