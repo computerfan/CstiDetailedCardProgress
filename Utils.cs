@@ -129,7 +129,7 @@ internal class Utils
                         ? "SpecialDurability4"
                         : fromCard.CardModel.SpecialDurability4.CardStatName, indent: indent + 2));
         }
-        else if (stateChange.ModType == CardModifications.Transform)
+        else if (stateChange.ModType == CardModifications.Transform && stateChange.TransformInto)
         {
             cardModTexts.Add(FormatBasicEntry(
                 new LocalizedString
@@ -192,9 +192,11 @@ internal class Utils
             $"<color=\"yellow\">{weight:0.#}</color> {new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.FormatWeight.Weight", DefaultText = "Weight" }}";
     }
 
-    public static string FormatProgressAndRate(float current, float max, string name, float rate, int indent = 0)
+    public static string FormatProgressAndRate(float current, float max, string name, float rate,
+        InGameCardBase currentCard = null, DurabilityStat stat = null, int indent = 0)
     {
-        return $"{FormatProgress(current, max, name, indent)}\n{FormatRate(rate, current, max)}";
+        return
+            $"{FormatProgress(current, max, name, indent)}\n{FormatRate(rate, current, max, currentCard: currentCard, stat: stat)}";
     }
 
     public static string FormatProgress(float current, float max, string name, int indent = 0)
@@ -209,27 +211,54 @@ internal class Utils
             : $"{ts.Hours:0}{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.h", DefaultText = "h" }}";
     }
 
-    public static string FormatRate(float value, float current, float max, float min = 0)
+    public static string FormatRate(float value, float current, float max, float min = 0, InGameCardBase currentCard = null, DurabilityStat stat = null)
     {
         string est = "";
+        string statOnFullZeroText = "";
+        string dropList = "";
+        string statOnFullZeroTitle = "";
         if (value > 0 && current < max)
         {
             float time = Math.Abs((max - current) / value);
-            TimeSpan timeSpan = new TimeSpan(0, (int)(Math.Ceiling(time) * 15), 0);
+            TimeSpan timeSpan = new(0, (int)(Math.Ceiling(time) * 15), 0);
             est =
                 $" ({new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.est.", DefaultText = "est." }} {Math.Ceiling(time)}t/{TimeSpanFormat(timeSpan)})";
+            if (stat != null && currentCard != null && stat.HasActionOnFull && stat.OnFull != null)
+            {
+                statOnFullZeroTitle = FormatBasicEntry(new LocalizedString
+                    { LocalizationKey = "CstiDetailedCardProgress.statOnFullTitle", DefaultText = "On Full" }, "", indent: 4);
+                dropList = Action.FormatCardDropList(
+                    GameManager.Instance.GetCollectionDropsReport(stat.OnFull, currentCard, false), currentCard,
+                    action: stat.OnFull, indent: 6);
+                statOnFullZeroText = FormatCardAction(stat.OnFull, currentCard, indent: 6);
+            }
         }
         else if (value < 0 && current > min)
         {
             float time = Math.Abs((current - min) / value);
-            TimeSpan timeSpan = new TimeSpan(0, (int)(Math.Ceiling(time) * 15), 0);
+            TimeSpan timeSpan = new(0, (int)(Math.Ceiling(time) * 15), 0);
             est =
                 $" ({new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.est.", DefaultText = "est." }} {Math.Ceiling(time)}t/{TimeSpanFormat(timeSpan)})";
+            if (stat != null && currentCard != null && stat.HasActionOnZero && stat.OnZero != null)
+            {
+                statOnFullZeroTitle = FormatBasicEntry(new LocalizedString
+                { LocalizationKey = "CstiDetailedCardProgress.statOnZeroTitle", DefaultText = "On Zero" }, "", indent: 4);
+                dropList = Action.FormatCardDropList(
+                    GameManager.Instance.GetCollectionDropsReport(stat.OnZero, currentCard, false), currentCard,
+                    action: stat.OnZero, indent: 6);
+                statOnFullZeroText = FormatCardAction(stat.OnZero, currentCard, indent: 6);
+            }
         }
-
-        return FormatTooltipEntry(value,
-            $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Rate", DefaultText = "Rate" }}<size=70%>{est}</size>",
-            2);
+        List<string> texts = new()
+        {
+            FormatTooltipEntry(value,
+                $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Rate", DefaultText = "Rate" }}<size=70%>{est}</size>",
+                2)
+        };
+        if (!string.IsNullOrWhiteSpace(statOnFullZeroTitle)) texts.Add(statOnFullZeroTitle);
+        if (!string.IsNullOrWhiteSpace(dropList)) texts.Add(dropList);
+        if (!string.IsNullOrWhiteSpace(statOnFullZeroText)) texts.Add(statOnFullZeroText);
+        return texts.Join(delimiter: "\n");
     }
 
     public static string FormatRateEntry(float value, string name)

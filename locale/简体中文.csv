@@ -34,3 +34,5 @@ CstiDetailedCardProgress.GivenCardStateChange,,发起方卡牌状态变更
 CstiDetailedCardProgress.Action.ExplorationDropsCount,Exploration Drops Count,探索掉落数量
 CstiDetailedCardProgress.Action.CurrentExploration,Current Exploration,当前探索
 CstiDetailedCardProgress.Action.ExplorationValue,Explored,探索值
+CstiDetailedCardProgress.statOnFullTitle,On Full,在为满时
+CstiDetailedCardProgress.statOnZeroTitle,On Zero,在为空时

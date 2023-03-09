@@ -302,7 +302,7 @@ namespace CstiDetailedCardProgress
                         ? new LocalizedString
                             { LocalizationKey = "CstiDetailedCardProgress.Spoilage", DefaultText = "Spoilage" }
                         : __instance.CardModel.SpoilageTime.CardStatName,
-                    __instance.CurrentSpoilageRate + (recipeStateChange?.SpoilageChange.x ?? 0)));
+                    __instance.CurrentSpoilageRate + (recipeStateChange?.SpoilageChange.x ?? 0), __instance, cardModel.SpoilageTime));
                 if (cardModel.SpoilageTime.RatePerDaytimePoint != 0)
                     texts.Add(FormatRateEntry(cardModel.SpoilageTime.RatePerDaytimePoint,
                         new LocalizedString
@@ -379,7 +379,7 @@ namespace CstiDetailedCardProgress
                         ? new LocalizedString
                             { LocalizationKey = "CstiDetailedCardProgress.Usage", DefaultText = "Usage" }
                         : __instance.CardModel.UsageDurability.CardStatName,
-                    __instance.CurrentUsageRate + (recipeStateChange?.UsageChange.x ?? 0)));
+                    __instance.CurrentUsageRate + (recipeStateChange?.UsageChange.x ?? 0), __instance, cardModel.UsageDurability));
                 if (cardModel.UsageDurability.RatePerDaytimePoint != 0)
                     texts.Add(FormatRateEntry(cardModel.UsageDurability.RatePerDaytimePoint,
                         new LocalizedString
@@ -413,7 +413,7 @@ namespace CstiDetailedCardProgress
                         ? new LocalizedString
                             { LocalizationKey = "CstiDetailedCardProgress.Fuel", DefaultText = "Fuel" }
                         : __instance.CardModel.FuelCapacity.CardStatName,
-                    __instance.CurrentFuelRate + (recipeStateChange?.FuelChange.x ?? 0)));
+                    __instance.CurrentFuelRate + (recipeStateChange?.FuelChange.x ?? 0), __instance, cardModel.FuelCapacity));
                 if (cardModel.FuelCapacity.RatePerDaytimePoint != 0)
                     texts.Add(FormatRateEntry(cardModel.FuelCapacity.RatePerDaytimePoint,
                         new LocalizedString
@@ -446,7 +446,7 @@ namespace CstiDetailedCardProgress
                         ? new LocalizedString
                             { LocalizationKey = "CstiDetailedCardProgress.Progress", DefaultText = "Progress" }
                         : __instance.CardModel.Progress.CardStatName,
-                    __instance.CurrentConsumableRate + (recipeStateChange?.ChargesChange.x ?? 0)));
+                    __instance.CurrentConsumableRate + (recipeStateChange?.ChargesChange.x ?? 0), __instance, cardModel.Progress));
                 if (cardModel.Progress.RatePerDaytimePoint != 0)
                     texts.Add(FormatRateEntry(cardModel.Progress.RatePerDaytimePoint,
                         new LocalizedString
@@ -503,7 +503,7 @@ namespace CstiDetailedCardProgress
                     string.IsNullOrEmpty(cardModel.SpecialDurability1.CardStatName)
                         ? "SpecialDurability1"
                         : __instance.CardModel.SpecialDurability1.CardStatName,
-                    __instance.CurrentSpecial1Rate + (recipeStateChange?.Special1Change.x ?? 0)));
+                    __instance.CurrentSpecial1Rate + (recipeStateChange?.Special1Change.x ?? 0), __instance, cardModel.SpecialDurability1));
                 if (cardModel.SpecialDurability1.RatePerDaytimePoint != 0)
                     texts.Add(FormatRateEntry(cardModel.SpecialDurability1.RatePerDaytimePoint,
                         new LocalizedString
@@ -536,7 +536,7 @@ namespace CstiDetailedCardProgress
                     string.IsNullOrEmpty(cardModel.SpecialDurability2.CardStatName)
                         ? "SpecialDurability2"
                         : __instance.CardModel.SpecialDurability2.CardStatName,
-                    __instance.CurrentSpecial2Rate + (recipeStateChange?.Special2Change.x ?? 0)));
+                    __instance.CurrentSpecial2Rate + (recipeStateChange?.Special2Change.x ?? 0), __instance, cardModel.SpecialDurability2));
                 if (cardModel.SpecialDurability2.RatePerDaytimePoint != 0)
                     texts.Add(FormatRateEntry(cardModel.SpecialDurability2.RatePerDaytimePoint,
                         new LocalizedString
@@ -569,7 +569,7 @@ namespace CstiDetailedCardProgress
                     string.IsNullOrEmpty(cardModel.SpecialDurability3.CardStatName)
                         ? "SpecialDurability3"
                         : __instance.CardModel.SpecialDurability3.CardStatName,
-                    __instance.CurrentSpecial3Rate + (recipeStateChange?.Special3Change.x ?? 0)));
+                    __instance.CurrentSpecial3Rate + (recipeStateChange?.Special3Change.x ?? 0), __instance, cardModel.SpecialDurability3));
                 if (cardModel.SpecialDurability3.RatePerDaytimePoint != 0)
                     texts.Add(FormatRateEntry(cardModel.SpecialDurability3.RatePerDaytimePoint,
                         new LocalizedString
@@ -602,7 +602,7 @@ namespace CstiDetailedCardProgress
                     string.IsNullOrEmpty(cardModel.SpecialDurability4.CardStatName)
                         ? "SpecialDurability4"
                         : __instance.CardModel.SpecialDurability4.CardStatName,
-                    __instance.CurrentSpecial4Rate + (recipeStateChange?.Special4Change.x ?? 0)));
+                    __instance.CurrentSpecial4Rate + (recipeStateChange?.Special4Change.x ?? 0), __instance, cardModel.SpecialDurability4));
                 if (cardModel.SpecialDurability4.RatePerDaytimePoint != 0)
                     texts.Add(FormatRateEntry(cardModel.SpecialDurability4.RatePerDaytimePoint,
                         new LocalizedString
