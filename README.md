@@ -71,3 +71,8 @@ __Toggle Note__: When using the hotkey to enable/disable the detailed tooltips, 
 - Fix hold text and bar not displaying when have a card interaction.
 - Shows state changes when build or deconstruct blueprints.
 - Should work safely with game version 1.04.
+
+## 1.1.3
+Resolved tooltip title overlap issue.
+New config entry "WeatherCardInspectable". Enabled by default to inspect weather card.
+Shows OnFull/Zero action details when card stats change.

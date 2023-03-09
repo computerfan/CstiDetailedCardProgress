@@ -4,7 +4,7 @@
 		<TargetFramework>net462</TargetFramework>
 		<AssemblyName>CstiDetailedCardProgress</AssemblyName>
 		<Description>CSTI Detailed Card Progress Mod</Description>
-		<Version>1.1.2</Version>
+		<Version>1.1.3</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 		<PackageId>space.cfan.CstiDetailedCardProgress</PackageId>
