@@ -29,6 +29,7 @@ namespace CstiDetailedCardProgress
         public static InGameStat InGamePlayerWeight;
         public static bool Enabled;
         public static KeyCode HotKey;
+        public static bool WeatherCardInspectable;
         public static bool RecipesShowTargetDuration;
         public static bool HideImpossibleDropSet;
         public static KeyCode TooltipNextPageHotKey;
@@ -57,6 +58,8 @@ namespace CstiDetailedCardProgress
             Enabled = Config.Bind("General", nameof(Enabled), true, "If true, will show the tool tips.").Value;
             HotKey = Config.Bind("General", nameof(HotKey), KeyCode.F2, "The key to enable and disable the tool tips")
                 .Value;
+            WeatherCardInspectable = Config.Bind("General", nameof(WeatherCardInspectable), true,
+                "If true, the weather card on the left side of the clock can be clicked to inspect. True is required for showing tooltip on it.").Value;
             RecipesShowTargetDuration = Config.Bind("Tweak", nameof(RecipesShowTargetDuration), false,
                 "If true, cookers like traps will show exact cooking duration instead of a range.").Value;
             HideImpossibleDropSet = Config.Bind("Tweak", nameof(HideImpossibleDropSet), true,
