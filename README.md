@@ -26,6 +26,7 @@ The configuration file can be found at /BepInEx/config/CstiDetailedCardProgress.
 |--|--|--|
 |Enabled|true|If set to true, will show the details tooltips|
 |HotKey|F2|The key to enable and disable the tool tips|
+|WeatherCardInspectable|true|If true, the weather card on the left side of the clock can be clicked to inspect. True is required for showing tooltip on it.|
 |RecipesShowTargetDuration|false|If true, cookers like traps will show exact cooking duration instead of a range.|
 |HideImpossibleDropSet|true|If true, impossible drop sets will be hidden.|
 |TooltipNextPageHotKey|RightBracket|The key to show next page of the tool tip.|
