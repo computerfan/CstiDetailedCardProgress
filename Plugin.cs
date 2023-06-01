@@ -14,6 +14,8 @@ using static CstiDetailedCardProgress.Utils;
 #if MELON_LOADER
 [assembly: MelonInfo(typeof(CstiDetailedCardProgress.Plugin), CstiDetailedCardProgress.PluginInfo.PLUGIN_NAME, CstiDetailedCardProgress.PluginInfo.PLUGIN_VERSION, "computerfan")]
 [assembly: MelonGame("WinterSpring Games", "Card Survival - Tropical Island")]
+[assembly: MelonGame("WinterSpringGames", "CardSurvivalTropicalIsland")]
+[assembly: MelonGame("winterspringgames", "survivaljourney")]
 #endif
 
 namespace CstiDetailedCardProgress
@@ -235,9 +237,9 @@ namespace CstiDetailedCardProgress
                                     { LocalizationKey = "CstiDetailedCardProgress.Capacity", DefaultText = "Capacity" },
                                 indent: 4));
                         for (int i = 0; i < __instance.CardsInInventory.Count; i++)
-                            if (__instance.CardsInInventory[i] != null && !__instance.CardsInInventory[i].IsFree)
-                                texts.Add(FormatTooltipEntry(__instance.CardsInInventory[i].CurrentWeight,
-                                    $"{__instance.CardsInInventory[i].CardAmt}x {__instance.CardsInInventory[i].MainCard.CardModel.CardName}",
+                            if (__instance.CardsInInventory.get_Item(i) != null && !__instance.CardsInInventory.get_Item(i).IsFree)
+                                texts.Add(FormatTooltipEntry(__instance.CardsInInventory.get_Item(i).CurrentWeight,
+                                    $"{__instance.CardsInInventory.get_Item(i).CardAmt}x {__instance.CardsInInventory.get_Item(i).MainCard.CardModel.CardName}",
                                     4));
                     }
 
@@ -327,7 +329,7 @@ namespace CstiDetailedCardProgress
                         new LocalizedString
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.SpoilageChange.x ?? 0) != 0)
-                    texts.Add(FormatRateEntry(recipeStateChange.Value.SpoilageChange.x,
+                    texts.Add(FormatRateEntry(recipeStateChange?.SpoilageChange.x ?? 0,
                         $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
             }
 
@@ -367,7 +369,7 @@ namespace CstiDetailedCardProgress
                         new LocalizedString
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.SpoilageChange.x ?? 0) != 0)
-                    texts.Add(FormatRateEntry(recipeStateChange.Value.SpoilageChange.x,
+                    texts.Add(FormatRateEntry(recipeStateChange?.SpoilageChange.x ?? 0,
                         $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
             }
 
@@ -404,7 +406,7 @@ namespace CstiDetailedCardProgress
                         new LocalizedString
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.UsageChange.x ?? 0) != 0)
-                    texts.Add(FormatRateEntry(recipeStateChange.Value.UsageChange.x,
+                    texts.Add(FormatRateEntry(recipeStateChange?.UsageChange.x ?? 0,
                         $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
             }
 
@@ -438,7 +440,7 @@ namespace CstiDetailedCardProgress
                         new LocalizedString
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.FuelChange.x ?? 0) != 0)
-                    texts.Add(FormatRateEntry(recipeStateChange.Value.FuelChange.x,
+                    texts.Add(FormatRateEntry(recipeStateChange?.FuelChange.x ?? 0,
                         $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
             }
 
@@ -472,7 +474,7 @@ namespace CstiDetailedCardProgress
                         new LocalizedString
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.ChargesChange.x ?? 0) != 0)
-                    texts.Add(FormatRateEntry(recipeStateChange.Value.ChargesChange.x,
+                    texts.Add(FormatRateEntry(recipeStateChange?.ChargesChange.x ?? 0,
                         $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
             }
 
@@ -490,12 +492,12 @@ namespace CstiDetailedCardProgress
                     texts.Add(baseEvaporationRate.Join(delimiter: "\n"));
                 if (__instance.CurrentProducedLiquids != null)
                     for (int i = 0; i < __instance.CurrentProducedLiquids.Count; i++)
-                        if (!__instance.CurrentProducedLiquids[i].IsEmpty &&
-                            !(__instance.CurrentProducedLiquids[i].LiquidCard != __instance.ContainedLiquidModel))
-                            texts.Add(FormatRateEntry(__instance.CurrentProducedLiquids[i].Quantity.x,
-                                $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Producing", DefaultText = "Producing" }} {__instance.CurrentProducedLiquids[i].LiquidCard.CardName}"));
+                        if (!__instance.CurrentProducedLiquids.get_Item(i).IsEmpty &&
+                            !(__instance.CurrentProducedLiquids.get_Item(i).LiquidCard != __instance.ContainedLiquidModel))
+                            texts.Add(FormatRateEntry(__instance.CurrentProducedLiquids.get_Item(i).Quantity.x,
+                                $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Producing", DefaultText = "Producing" }} {__instance.CurrentProducedLiquids.get_Item(i).LiquidCard.CardName}"));
                 if ((recipeStateChange?.ModifyLiquid ?? false) && (recipeStateChange?.LiquidQuantityChange.x ?? 0) != 0)
-                    texts.Add(FormatRateEntry(recipeStateChange.Value.LiquidQuantityChange.x,
+                    texts.Add(FormatRateEntry(recipeStateChange?.LiquidQuantityChange.x ?? 0,
                         $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
             }
 
@@ -528,7 +530,7 @@ namespace CstiDetailedCardProgress
                         new LocalizedString
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.Special1Change.x ?? 0) != 0)
-                    texts.Add(FormatRateEntry(recipeStateChange.Value.Special1Change.x,
+                    texts.Add(FormatRateEntry(recipeStateChange?.Special1Change.x ?? 0,
                         $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
             }
 
@@ -561,7 +563,7 @@ namespace CstiDetailedCardProgress
                         new LocalizedString
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.Special2Change.x ?? 0) != 0)
-                    texts.Add(FormatRateEntry(recipeStateChange.Value.Special2Change.x,
+                    texts.Add(FormatRateEntry(recipeStateChange?.Special2Change.x ?? 0,
                         $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
             }
 
@@ -594,7 +596,7 @@ namespace CstiDetailedCardProgress
                         new LocalizedString
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.Special3Change.x ?? 0) != 0)
-                    texts.Add(FormatRateEntry(recipeStateChange.Value.Special3Change.x,
+                    texts.Add(FormatRateEntry(recipeStateChange?.Special3Change.x ?? 0,
                         $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
             }
 
@@ -627,7 +629,7 @@ namespace CstiDetailedCardProgress
                         new LocalizedString
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.Special4Change.x ?? 0) != 0)
-                    texts.Add(FormatRateEntry(recipeStateChange.Value.Special4Change.x,
+                    texts.Add(FormatRateEntry(recipeStateChange?.Special4Change.x ?? 0,
                         $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
             }
 

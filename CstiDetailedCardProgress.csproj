@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net462</TargetFramework>
+		<TargetFramework>net472</TargetFramework>
 		<AssemblyName>CstiDetailedCardProgress</AssemblyName>
 		<Description>CSTI Detailed Card Progress Mod</Description>
-		<Version>1.1.3</Version>
+		<Version>1.1.4</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 		<PackageId>space.cfan.CstiDetailedCardProgress</PackageId>
@@ -13,11 +13,13 @@
 		<Product>CSTIDetailedCardProgressMod</Product>
 		<Company />
 		<GameAssemblyPath Condition="'$(GameAssemblyPath)' == ''">..\..\Card Survival - Tropical Island_Data\Managed</GameAssemblyPath>
+		<GameAssemblyPath Condition="'$(GameAssemblyPath)' != '' and ('$(Configuration)'=='Release-MelonLoader' or '$(Configuration)'=='Debug-MelonLoader')">android\managed</GameAssemblyPath>
 		<MelonLoaderAssemblyPath Condition="'$(MelonLoaderAssemblyPath)' == ''">..\MelonLoader</MelonLoaderAssemblyPath>
 		<DebugType>Full</DebugType>
 		<Configurations>Debug;Release;Release-MelonLoader;Debug-MelonLoader</Configurations>
 		<PackageProjectUrl>https://github.com/computerfan/CstiDetailedCardProgress</PackageProjectUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<AssemblyVersion></AssemblyVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-MelonLoader|AnyCPU'">
@@ -29,6 +31,12 @@
 	  <DefineConstants>TRACE;MELON_LOADER</DefineConstants>
 	  <Optimize>false</Optimize>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="android\**" />
+	  <EmbeddedResource Remove="android\**" />
+	  <None Remove="android\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<EmbeddedResource Include="locale\简体中文.csv" />
@@ -49,7 +57,6 @@
 		<Reference Include="Assembly-CSharp">
 			<HintPath>$(GameAssemblyPath)\Assembly-CSharp.dll</HintPath>
 		</Reference>
-
 		<Reference Include="Unity.TextMeshPro">
 			<HintPath>$(GameAssemblyPath)\Unity.TextMeshPro.dll</HintPath>
 		</Reference>
@@ -69,14 +76,58 @@
 			<HintPath>$(GameAssemblyPath)\UnityEngine.UI.dll</HintPath>
 		</Reference>
 	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release-MelonLoader|AnyCPU'">
+	<ItemGroup Condition="'$(Configuration)'=='Release-MelonLoader' or '$(Configuration)'=='Debug-MelonLoader'">
 		<Reference Include="MelonLoader">
 			<HintPath>$(MelonLoaderAssemblyPath)\MelonLoader.dll</HintPath>
 		</Reference>
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug-MelonLoader|AnyCPU'">
-		<Reference Include="MelonLoader">
-			<HintPath>$(MelonLoaderAssemblyPath)\MelonLoader.dll</HintPath>
+		<Reference Include="AssemblyUnhollower">
+			<HintPath>D:\Fan\Documents\GitHub\Il2CppAssemblyUnhollower\AssemblyUnhollower\bin\Debug\net4.7.2\AssemblyUnhollower.dll</HintPath>
+		</Reference>
+		<Reference Include="Iced">
+			<HintPath>D:\Fan\Documents\GitHub\Il2CppAssemblyUnhollower\AssemblyUnhollower\bin\Debug\net4.7.2\Iced.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppMono.Security">
+			<HintPath>android\managed\Il2CppMono.Security.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2Cppmscorlib">
+			<HintPath>android\managed\Il2Cppmscorlib.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem">
+			<HintPath>android\managed\Il2CppSystem.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem.Configuration">
+			<HintPath>android\managed\Il2CppSystem.Configuration.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem.Core">
+			<HintPath>android\managed\Il2CppSystem.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem.Diagnostics.StackTrace">
+			<HintPath>android\managed\Il2CppSystem.Diagnostics.StackTrace.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem.Globalization.Extensions">
+			<HintPath>android\managed\Il2CppSystem.Globalization.Extensions.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem.Xml">
+			<HintPath>android\managed\Il2CppSystem.Xml.dll</HintPath>
+		</Reference>
+		<Reference Include="Mono.Cecil">
+			<HintPath>D:\Fan\Documents\GitHub\Il2CppAssemblyUnhollower\AssemblyUnhollower\bin\Debug\net4.7.2\Mono.Cecil.dll</HintPath>
+		</Reference>
+		<Reference Include="Mono.Cecil.Mdb">
+			<HintPath>D:\Fan\Documents\GitHub\Il2CppAssemblyUnhollower\AssemblyUnhollower\bin\Debug\net4.7.2\Mono.Cecil.Mdb.dll</HintPath>
+		</Reference>
+		<Reference Include="Mono.Cecil.Pdb">
+			<HintPath>D:\Fan\Documents\GitHub\Il2CppAssemblyUnhollower\AssemblyUnhollower\bin\Debug\net4.7.2\Mono.Cecil.Pdb.dll</HintPath>
+		</Reference>
+		<Reference Include="Mono.Cecil.Rocks">
+			<HintPath>D:\Fan\Documents\GitHub\Il2CppAssemblyUnhollower\AssemblyUnhollower\bin\Debug\net4.7.2\Mono.Cecil.Rocks.dll</HintPath>
+		</Reference>
+		<Reference Include="UnhollowerBaseLib">
+			<HintPath>D:\Fan\Documents\GitHub\Il2CppAssemblyUnhollower\AssemblyUnhollower\bin\Debug\net4.7.2\UnhollowerBaseLib.dll</HintPath>
+		</Reference>
+		<Reference Include="UnhollowerRuntimeLib">
+			<HintPath>D:\Fan\Documents\GitHub\Il2CppAssemblyUnhollower\AssemblyUnhollower\bin\Debug\net4.7.2\UnhollowerRuntimeLib.dll</HintPath>
 		</Reference>
 	</ItemGroup>
+
 </Project>

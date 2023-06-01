@@ -58,14 +58,14 @@ internal class Stat
         if (stat.StatModel.UsesNovelty && stat.StalenessValues.Count > 0)
         {
             List<string> stalenessText = new();
-            stat.StalenessValues.ForEach(staleness =>
+            foreach(var staleness in stat.StalenessValues)
             {
                 if (staleness.Quantity > -1 && stat.StatModel.StalenessMultiplier != 0)
                     stalenessText.Add(FormatBasicEntry(
                         $"{Mathf.Pow(stat.StatModel.StalenessMultiplier, staleness.Quantity + 1):G3}x",
                         $"(est. {stat.StatModel.NoveltyCooldownDuration - gm.CurrentTickInfo.z + staleness.LastTick + Math.Max(0, staleness.Quantity) * stat.StatModel.NoveltyCooldownDuration}t) {staleness.ModifierSource}",
                         indent: 2));
-            });
+            };
             if (stalenessText.Count > 0)
             {
                 texts.Add(FormatBasicEntry(

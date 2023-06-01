@@ -46,7 +46,7 @@ internal class Action
             if (__instance.name == "Button" ||
                 Traverse.Create(explorationPopup).Field("CurrentPhase").GetValue<int>() != 0) return;
             currentCard = explorationPopup.ExplorationCard;
-            action = currentCard.CardModel?.DismantleActions[0];
+            action = currentCard.CardModel?.DismantleActions.get_Item(0);
             if (action != null)
             {
                 if (currentCard.ExplorationData != null)
@@ -175,18 +175,18 @@ internal class Action
                         { LocalizationKey = "CstiDetailedCardProgress.Action.Base", DefaultText = "Base" },
                     4 + indent));
             if (withStat && report.DropsInfo[i].StatMods != null)
-                report.DropsInfo[i].StatWeightMods.Do(statmod =>
+                foreach(StatDropWeightModReport statmod in report.DropsInfo[i].StatWeightMods)
                 {
                     if (statmod.BonusWeight != 0)
                         texts.Add(FormatTooltipEntry(statmod.BonusWeight, $"{statmod.Stat.GameName}", 4 + indent));
-                });
+                };
             if (withCard && report.DropsInfo[i].CardWeightMods != null)
-                report.DropsInfo[i].CardWeightMods.Do(cardmod =>
+                foreach(var cardmod in report.DropsInfo[i].CardWeightMods)
                 {
                     if (cardmod.BonusWeight != 0)
                         texts.Add(FormatTooltipEntry(cardmod.BonusWeight, $"{cardmod.Card.CardModel.CardName}",
                             4 + indent));
-                });
+                };
             if (withDuability)
             {
                 if (report.DropsInfo[i].DurabilitiesWeightMods.SpoilageWeight != 0)

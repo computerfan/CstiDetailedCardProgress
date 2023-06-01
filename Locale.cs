@@ -21,13 +21,13 @@ internal class Locale
         if (stream == null || !stream.CanRead) return;
         using StreamReader reader = new StreamReader(stream);
         string localizationString = reader.ReadToEnd();
-        Dictionary<string, List<string>> dictionary = CSVParser.LoadFromString(localizationString);
+        var dictionary = CSVParser.LoadFromString(localizationString);
 
         Regex regex = new Regex("\\\\n");
         Dictionary<string, string> currentTexts = Traverse.Create(__instance).Field("CurrentTexts")
             .GetValue<Dictionary<string, string>>();
-        foreach (KeyValuePair<string, List<string>> item in dictionary)
+        foreach (var item in dictionary)
             if (!currentTexts.ContainsKey(item.Key) && item.Value.Count >= 2)
-                currentTexts.Add(item.Key, regex.Replace(item.Value[1], "\n"));
+                currentTexts.Add(item.Key, regex.Replace(item.Value.get_Item(1), "\n"));
     }
 }

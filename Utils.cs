@@ -5,8 +5,15 @@ using UnityEngine;
 
 namespace CstiDetailedCardProgress;
 
-internal class Utils
+public static class Utils
 {
+#if MELON_LOADER
+#else
+    public static T get_Item<T>(this List<T> list, int index)
+    {
+        return list[index];
+    }
+#endif
     public static string FormatCardOnCardAction(CardOnCardAction action, InGameCardBase recivingCard,
         InGameCardBase givenCard, int indent = 0)
     {
