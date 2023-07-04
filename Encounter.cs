@@ -14,10 +14,11 @@ namespace CstiDetailedCardProgress
         public static void OnHoverEnter(EncounterOptionButton __instance)
         {
             if (!Plugin.Enabled) return;
-            List<string> texts = new();
             EncounterPopup popup = __instance.GetComponentInParent<EncounterPopup>();
             if (popup == null) return;
             int actionIndex = __instance.Index;
+            if (actionIndex < 0 || actionIndex > popup.EncounterPlayerActions.Count - 1) return;
+            List<string> texts = new();
             texts.Add(FormatEncounterPlayerAction(popup.EncounterPlayerActions.get_Item(actionIndex), popup, actionIndex));
 
             string newContent = texts.Join(delimiter: "\n");
