@@ -257,8 +257,10 @@ public static class Utils
             {
                 statOnFullZeroTitle = FormatBasicEntry(new LocalizedString
                     { LocalizationKey = "CstiDetailedCardProgress.statOnFullTitle", DefaultText = "On Full" }, "", indent: 4);
+                CollectionDropReport collectionDropsReport =
+                    GameManager.Instance.GetCollectionDropsReport(stat.OnFull, currentCard, false);
                 dropList = Action.FormatCardDropList(
-                    GameManager.Instance.GetCollectionDropsReport(stat.OnFull, currentCard, false), currentCard,
+                    collectionDropsReport, currentCard,
                     action: stat.OnFull, indent: 6);
                 statOnFullZeroText = FormatCardAction(stat.OnFull, currentCard, indent: 6);
             }
@@ -273,8 +275,10 @@ public static class Utils
             {
                 statOnFullZeroTitle = FormatBasicEntry(new LocalizedString
                 { LocalizationKey = "CstiDetailedCardProgress.statOnZeroTitle", DefaultText = "On Zero" }, "", indent: 4);
+                CollectionDropReport collectionDropsReport =
+                    GameManager.Instance.GetCollectionDropsReport(stat.OnZero, currentCard, false);
                 dropList = Action.FormatCardDropList(
-                    GameManager.Instance.GetCollectionDropsReport(stat.OnZero, currentCard, false), currentCard,
+                    collectionDropsReport, currentCard,
                     action: stat.OnZero, indent: 6);
                 statOnFullZeroText = FormatCardAction(stat.OnZero, currentCard, indent: 6);
             }

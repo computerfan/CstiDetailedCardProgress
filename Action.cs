@@ -174,7 +174,7 @@ internal class Action
                     new LocalizedString
                         { LocalizationKey = "CstiDetailedCardProgress.Action.Base", DefaultText = "Base" },
                     4 + indent));
-            if (withStat && report.DropsInfo[i].StatMods != null)
+            if (withStat && report.DropsInfo[i].StatWeightMods != null)
                 foreach(StatDropWeightModReport statmod in report.DropsInfo[i].StatWeightMods)
                 {
                     if (statmod.BonusWeight != 0)
