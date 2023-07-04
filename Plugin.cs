@@ -78,6 +78,7 @@ namespace CstiDetailedCardProgress
             Harmony.CreateAndPatchAll(typeof(Locale));
             Harmony.CreateAndPatchAll(typeof(TooltipMod));
             Harmony.CreateAndPatchAll(typeof(PrefabMod));
+            Harmony.CreateAndPatchAll(typeof(Encounter));
 
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }

@@ -14,6 +14,29 @@ public static class Utils
         return list[index];
     }
 #endif
+
+    public static string FormatEncounterPlayerAction(EncounterPlayerAction action, EncounterPopup popup, int actionIndex)
+    {
+        Traverse popupRef = Traverse.Create(popup);
+        MeleeClashResultsReport backupCurrentRoundMeleeClashResult = popupRef.Field("CurrentRoundMeleeClashResult").GetValue<MeleeClashResultsReport>();
+        RangedClashResultReport backupCurrentRoundRangedClashResult = popupRef.Field("CurrentRoundRangedClashResult").GetValue<RangedClashResultReport>();
+        float num = popupRef.Method("CalculateActionClashChance", action).GetValue<float>(action);
+        MeleeClashResultsReport currentRoundMeleeClashResult = popupRef
+            .Field("CurrentRoundMeleeClashResult").GetValue<MeleeClashResultsReport>();
+        RangedClashResultReport currentRoundRangedClashResult = popupRef
+            .Field("CurrentRoundRangedClashResult").GetValue<RangedClashResultReport>();
+        popupRef.Field("CurrentRoundMeleeClashResult").SetValue(backupCurrentRoundMeleeClashResult);
+        popupRef.Field("CurrentRoundRangedClashResult").SetValue(backupCurrentRoundRangedClashResult);
+        
+
+        return action.ActionRange switch
+        {
+            ActionRange.Melee => currentRoundMeleeClashResult.PlayerSummary + "\n" + currentRoundMeleeClashResult.EnemySummary + "\n" + currentRoundMeleeClashResult.ResultsSummary(),
+            ActionRange.Ranged => currentRoundRangedClashResult.PlayerSummary() + "\n" + currentRoundRangedClashResult.EnemySummary() + "\n" + currentRoundRangedClashResult.ResultsSummary(),
+            _ => ""
+        };
+    }
+
     public static string FormatCardOnCardAction(CardOnCardAction action, InGameCardBase recivingCard,
         InGameCardBase givenCard, int indent = 0)
     {
