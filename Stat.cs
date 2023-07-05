@@ -14,7 +14,7 @@ internal class Stat
     {
         if (Plugin.Enabled)
             __instance.SetTooltip(__instance.Title,
-                $"{(string.IsNullOrWhiteSpace(__instance.ModelStatus.Description) ? "" : $"{__instance.ModelStatus.Description}\n")}{FormatInGameStat(__instance.ModelStatus.ParentStat)}",
+                $"{(string.IsNullOrWhiteSpace(__instance.ModelStatus.Description) ? "" : $"{__instance.ModelStatus.Description.ToString()}\n")}{FormatInGameStat(__instance.ModelStatus.ParentStat)}",
                 "");
         else
             //Reset the tool tip to the base game settings.
@@ -28,7 +28,7 @@ internal class Stat
         List<string> rateModsTexts = new();
         if (stat.CurrentBaseValue != 0)
             valueModsTexts.Add(FormatBasicEntry($"{stat.CurrentBaseValue:0.##}",
-                new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Stat.Base", DefaultText = "Base" },
+                new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Stat.Base", DefaultText = "Base" }.ToString(),
                 indent: 2));
         GameManager gm = MBSingleton<GameManager>.Instance;
         // Seems deplicated with some sources in stat.ModifierSources
@@ -39,7 +39,7 @@ internal class Stat
         //}
         if (stat.CurrentBaseRate != 0)
             rateModsTexts.Add(FormatRateEntry(stat.CurrentBaseRate,
-                new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Stat.Base", DefaultText = "Base" }));
+                new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Stat.Base", DefaultText = "Base" }.ToString()));
         foreach (StatModifierSource modifierSource in stat.ModifierSources)
             if (modifierSource.ValidNumbers && modifierSource.ValidSource)
             {
@@ -87,14 +87,14 @@ internal class Stat
         if (modifierSource.Stat != null)
             sourceName = modifierSource.Stat.StatModel.GameName;
         else if (modifierSource.Card != null)
-            sourceName = modifierSource.Card.CardModel.CardName;
+            sourceName = modifierSource.Card.CardModel.CardName.ToString();
         else if (modifierSource.Character != null)
             sourceName = modifierSource.Character.CharacterName;
         else if (modifierSource.Perk != null)
             sourceName = modifierSource.Perk.PerkName;
         else if (modifierSource.TimeOfDay != null)
             sourceName =
-                $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Stat.Time", DefaultText = "Time" }} {modifierSource.TimeOfDay.EffectStartingTime}~{modifierSource.TimeOfDay.EffectEndTime}";
+                $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Stat.Time", DefaultText = "Time" }.ToString()} {modifierSource.TimeOfDay.EffectStartingTime}~{modifierSource.TimeOfDay.EffectEndTime}";
         return sourceName;
     }
 }

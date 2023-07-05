@@ -17,12 +17,19 @@ internal class Action
         List<string> texts = new();
         GameManager gm = GameManager.Instance;
         CollectionDropReport dropReport =
+#if MELON_LOADER
+            __instance.DropReport;
+#else
             Traverse.Create(__instance).Field("DropReport").GetValue<CollectionDropReport>();
+#endif
         if (dropReport.FromCard != null && dropReport.FromAction != null &&
             dropReport.FromAction.HasSuccessfulDrop &&
             dropReport.DropsInfo.Length > 0) texts.Add(FormatCardDropList(dropReport, dropReport.FromCard));
         InspectionPopup popup = __instance.GetComponentInParent<InspectionPopup>();
         ExplorationPopup explorationPopup = __instance.GetComponentInParent<ExplorationPopup>();
+#if MELON_LOADER
+        BlueprintConstructionPopup blueprintConstructionPopup = __instance.GetComponentInParent<BlueprintConstructionPopup>();
+#endif
         InGameCardBase currentCard = null;
         DismantleCardAction action = null;
         if (popup && popup.CurrentCard)
@@ -31,10 +38,19 @@ internal class Action
             if (currentCard.IsBlueprintInstance)
             {
                 if (__instance.Index == -2)
+#if MELON_LOADER
+                    action = blueprintConstructionPopup.CurrentBuildAction;
+#else
                     action = Traverse.Create(popup).Field("CurrentBuildAction").GetValue<DismantleCardAction>();
+#endif
+
                 else if (__instance.Index == -1)
+#if MELON_LOADER
+                    action = blueprintConstructionPopup.CurrentDeconstructAction;
+#else
                     action = Traverse.Create(popup).Field("CurrentDeconstructAction")
                         .GetValue<DismantleCardAction>();
+#endif
             }
             else if (__instance.Index > -1 && __instance.Index < currentCard.DismantleActions.Length)
             {
@@ -43,8 +59,12 @@ internal class Action
         }
         else if (explorationPopup && explorationPopup.ExplorationCard)
         {
+#if MELON_LOADER
+            if (__instance.name == "Button" || explorationPopup.CurrentPhase != 0) return;
+#else
             if (__instance.name == "Button" ||
-                Traverse.Create(explorationPopup).Field("CurrentPhase").GetValue<int>() != 0) return;
+                            Traverse.Create(explorationPopup).Field("CurrentPhase").GetValue<int>() != 0) return;
+#endif
             currentCard = explorationPopup.ExplorationCard;
             action = currentCard.CardModel?.DismantleActions.get_Item(0);
             if (action != null)
@@ -102,13 +122,21 @@ internal class Action
         if (!string.IsNullOrWhiteSpace(newContent))
         {
             ActionTooltip.TooltipTitle = __instance.Title;
+#if MELON_LOADER
+            string orgContent = __instance.MyTooltip.TooltipContent;
+#else
             string orgContent = Traverse.Create(__instance).Field("MyTooltip").Field("TooltipContent")
                 .GetValue<string>();
+#endif
             ActionTooltip.TooltipContent = orgContent + (string.IsNullOrEmpty(orgContent) ? "" : "\n") +
                                            "<size=70%>" + newContent + "</size>";
+#if MELON_LOADER
+            ActionTooltip.HoldText = __instance.MyTooltip.HoldText;
+#else
             ActionTooltip.HoldText =
                 Traverse.Create(__instance).Field("MyTooltip").Field("HoldText").GetValue<string>();
             // Traverse.Create(__instance).Method("CancelTooltip").GetValue();
+#endif
             Tooltip.AddTooltip(ActionTooltip);
         }
     }
@@ -140,13 +168,13 @@ internal class Action
                 (!report.DropsInfo[i].IsSuccess || report.DropsInfo[i].FinalWeight < -10000)) continue;
             string dropCardTexts = report.DropsInfo[i].Drops.Where(c => c != null).GroupBy(
                     c => new { c.CardType, c.CardName }, c => c,
-                    (k, cs) => new { name = k.CardName, count = cs.Count(), type = k.CardType })
+                    (k, cs) => new { name = k.CardName.ToString(), count = cs.Count(), type = k.CardType })
                 .Select(r => $"{ColorFloat(r.count)} ({r.type}){r.name}").Join();
             if (action != null && action.ProducedCards != null && action.ProducedCards[0].DropsLiquid)
             {
                 LiquidDrop currentLiquidDrop = action.ProducedCards[0].CurrentLiquidDrop;
                 string liquidDropText =
-                    $"{FormatMinMaxValue(currentLiquidDrop.Quantity)} ({currentLiquidDrop.LiquidCard.CardType}){currentLiquidDrop.LiquidCard.CardName}";
+                    $"{FormatMinMaxValue(currentLiquidDrop.Quantity)} ({currentLiquidDrop.LiquidCard.CardType}){currentLiquidDrop.LiquidCard.CardName.ToString()}";
                 dropCardTexts = report.DropsInfo[i].Drops.Length == 0
                     ? liquidDropText
                     : string.Join(", ", dropCardTexts, liquidDropText);
@@ -156,23 +184,23 @@ internal class Action
             {
                 if (string.IsNullOrWhiteSpace(dropCardTexts)) return "";
                 return FormatBasicEntry(
-                    $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.CardDrops", DefaultText = "Card Drops" }}",
+                    $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.CardDrops", DefaultText = "Card Drops" }.ToString()}",
                     dropCardTexts, indent: indent);
             }
 
             texts.Add(FormatBasicEntry($"{dropRate:P2}", $"{report.DropsInfo[i].CollectionName}", indent: indent));
             if (!string.IsNullOrWhiteSpace(dropCardTexts))
                 texts.Add(FormatBasicEntry(
-                    $"<size=55%>{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.CardDrops", DefaultText = "Card Drops" }}</size>",
+                    $"<size=55%>{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Action.CardDrops", DefaultText = "Card Drops" }.ToString()}</size>",
                     "<size=55%>" + dropCardTexts + "</size>", indent: 2 + indent));
             texts.Add(FormatBasicEntry($"{report.DropsInfo[i].FinalWeight}/{report.TotalValue}",
                 new LocalizedString
-                    { LocalizationKey = "CstiDetailedCardProgress.Action.Weight", DefaultText = "Weight" },
+                    { LocalizationKey = "CstiDetailedCardProgress.Action.Weight", DefaultText = "Weight" }.ToString(),
                 indent: 2 + indent));
             if (report.DropsInfo[i].BaseWeight != 0)
                 texts.Add(FormatTooltipEntry(report.DropsInfo[i].BaseWeight,
                     new LocalizedString
-                        { LocalizationKey = "CstiDetailedCardProgress.Action.Base", DefaultText = "Base" },
+                        { LocalizationKey = "CstiDetailedCardProgress.Action.Base", DefaultText = "Base" }.ToString(),
                     4 + indent));
             if (withStat && report.DropsInfo[i].StatWeightMods != null)
                 foreach(StatDropWeightModReport statmod in report.DropsInfo[i].StatWeightMods)
@@ -184,35 +212,35 @@ internal class Action
                 foreach(var cardmod in report.DropsInfo[i].CardWeightMods)
                 {
                     if (cardmod.BonusWeight != 0)
-                        texts.Add(FormatTooltipEntry(cardmod.BonusWeight, $"{cardmod.Card.CardModel.CardName}",
+                        texts.Add(FormatTooltipEntry(cardmod.BonusWeight, $"{cardmod.Card.CardModel.CardName.ToString()}",
                             4 + indent));
                 };
             if (withDuability)
             {
                 if (report.DropsInfo[i].DurabilitiesWeightMods.SpoilageWeight != 0)
                     texts.Add(FormatTooltipEntry(report.DropsInfo[i].DurabilitiesWeightMods.SpoilageWeight,
-                        $"{fromCard.CardModel.SpoilageTime.CardStatName}", 4 + indent));
+                        $"{fromCard.CardModel.SpoilageTime.CardStatName.ToString()}", 4 + indent));
                 if (report.DropsInfo[i].DurabilitiesWeightMods.UsageWeight != 0)
                     texts.Add(FormatTooltipEntry(report.DropsInfo[i].DurabilitiesWeightMods.UsageWeight,
-                        $"{fromCard.CardModel.UsageDurability.CardStatName}", 4 + indent));
+                        $"{fromCard.CardModel.UsageDurability.CardStatName.ToString()}", 4 + indent));
                 if (report.DropsInfo[i].DurabilitiesWeightMods.FuelWeight != 0)
                     texts.Add(FormatTooltipEntry(report.DropsInfo[i].DurabilitiesWeightMods.FuelWeight,
-                        $"{fromCard.CardModel.FuelCapacity.CardStatName}", 4 + indent));
+                        $"{fromCard.CardModel.FuelCapacity.CardStatName.ToString()}", 4 + indent));
                 if (report.DropsInfo[i].DurabilitiesWeightMods.ProgressWeight != 0)
                     texts.Add(FormatTooltipEntry(report.DropsInfo[i].DurabilitiesWeightMods.ProgressWeight,
-                        $"{fromCard.CardModel.Progress.CardStatName}", 4 + indent));
+                        $"{fromCard.CardModel.Progress.CardStatName.ToString()}", 4 + indent));
                 if (report.DropsInfo[i].DurabilitiesWeightMods.Special1Weight != 0)
                     texts.Add(FormatTooltipEntry(report.DropsInfo[i].DurabilitiesWeightMods.Special1Weight,
-                        $"{fromCard.CardModel.SpecialDurability1.CardStatName}", 4 + indent));
+                        $"{fromCard.CardModel.SpecialDurability1.CardStatName.ToString()}", 4 + indent));
                 if (report.DropsInfo[i].DurabilitiesWeightMods.Special2Weight != 0)
                     texts.Add(FormatTooltipEntry(report.DropsInfo[i].DurabilitiesWeightMods.Special2Weight,
-                        $"{fromCard.CardModel.SpecialDurability2.CardStatName}", 4 + indent));
+                        $"{fromCard.CardModel.SpecialDurability2.CardStatName.ToString()}", 4 + indent));
                 if (report.DropsInfo[i].DurabilitiesWeightMods.Special3Weight != 0)
                     texts.Add(FormatTooltipEntry(report.DropsInfo[i].DurabilitiesWeightMods.Special3Weight,
-                        $"{fromCard.CardModel.SpecialDurability3.CardStatName}", 4 + indent));
+                        $"{fromCard.CardModel.SpecialDurability3.CardStatName.ToString()}", 4 + indent));
                 if (report.DropsInfo[i].DurabilitiesWeightMods.Special4Weight != 0)
                     texts.Add(FormatTooltipEntry(report.DropsInfo[i].DurabilitiesWeightMods.Special4Weight,
-                        $"{fromCard.CardModel.SpecialDurability4.CardStatName}", 4 + indent));
+                        $"{fromCard.CardModel.SpecialDurability4.CardStatName.ToString()}", 4 + indent));
             }
 
             if (report.DropsInfo[i].StatMods != null)

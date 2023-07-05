@@ -16,6 +16,10 @@ using static CstiDetailedCardProgress.Utils;
 [assembly: MelonGame("WinterSpring Games", "Card Survival - Tropical Island")]
 [assembly: MelonGame("WinterSpringGames", "CardSurvivalTropicalIsland")]
 [assembly: MelonGame("winterspringgames", "survivaljourney")]
+[assembly: MelonGame("winterspringgames", "survivaljourneydemo")]
+[assembly: HarmonyDontPatchAll]
+[assembly: MelonPlatformDomain(MelonPlatformDomainAttribute.CompatibleDomains.IL2CPP)]
+[assembly: MelonPlatform((MelonPlatformAttribute.CompatiblePlatforms)3)] // 3 = Android
 #endif
 
 namespace CstiDetailedCardProgress
@@ -41,17 +45,42 @@ namespace CstiDetailedCardProgress
         public static string LastDragHoverCardOrgTooltipContent;
 
 #if MELON_LOADER
+        private MelonPreferences_Category GeneralPreferencesCategory;
+        private MelonPreferences_Category TweakPreferencesCategory;
+        private MelonPreferences_Entry<bool> WeatherCardInspectableEntry;
+        private MelonPreferences_Entry<bool> EnabledEntry;
+        private MelonPreferences_Entry<KeyCode> HotKeyEntry;
+        private MelonPreferences_Entry<bool> RecipesShowTargetDurationEntry;
+        private MelonPreferences_Entry<bool> HideImpossibleDropSetEntry;
         public override void OnInitializeMelon()
         {
-            Enabled = true;
-            HotKey = KeyCode.F2;
-            RecipesShowTargetDuration = false;
-            HideImpossibleDropSet = true;
+            GeneralPreferencesCategory = MelonPreferences.CreateCategory("General");
+            TweakPreferencesCategory = MelonPreferences.CreateCategory("Tweak");
+            GeneralPreferencesCategory.SetFilePath("UserData/CstiDetailedCardProgress.cfg");
+            TweakPreferencesCategory.SetFilePath("UserData/CstiDetailedCardProgress.cfg");
+            EnabledEntry = GeneralPreferencesCategory.CreateEntry(nameof(Enabled), true, "If true, will show the tool tips.");
+            HotKeyEntry = GeneralPreferencesCategory.CreateEntry(nameof(HotKey), KeyCode.F2, "The key to enable and disable the tool tips");
+            WeatherCardInspectableEntry = GeneralPreferencesCategory.CreateEntry(nameof(WeatherCardInspectable), true, "If true, will make weather card inspect-able");
+            RecipesShowTargetDurationEntry = TweakPreferencesCategory.CreateEntry(nameof(RecipesShowTargetDuration), false, "If true, will show the target duration of recipes");
+            HideImpossibleDropSetEntry = TweakPreferencesCategory.CreateEntry(nameof(HideImpossibleDropSet), true, "If true, will hide the impossible drop set");
+            Enabled = EnabledEntry.Value; 
+            HotKey = HotKeyEntry.Value;
+            WeatherCardInspectable = WeatherCardInspectableEntry.Value;
+            RecipesShowTargetDuration = RecipesShowTargetDurationEntry.Value;
+            HideImpossibleDropSet = HideImpossibleDropSetEntry.Value;
+
             HarmonyLib.Harmony.CreateAndPatchAll(typeof(Plugin));
             HarmonyLib.Harmony.CreateAndPatchAll(typeof(Stat));
             HarmonyLib.Harmony.CreateAndPatchAll(typeof(Action));
             HarmonyLib.Harmony.CreateAndPatchAll(typeof(Locale));
+            Locale.LoadLanguagePostfix();
             HarmonyLib.Harmony.CreateAndPatchAll(typeof(TooltipMod));
+            HarmonyLib.Harmony.CreateAndPatchAll(typeof(PrefabMod));
+            HarmonyLib.Harmony.CreateAndPatchAll(typeof(Encounter));
+
+            GeneralPreferencesCategory.SaveToFile();
+            TweakPreferencesCategory.SaveToFile();
+
             LoggerInstance.Msg($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
 #else
@@ -124,14 +153,22 @@ namespace CstiDetailedCardProgress
 
                 if (LastDragHoverCard != null)
                 {
+#if MELON_LOADER
+                    TooltipText orgTooltip = LastDragHoverCard.MyTooltip;
+#else
                     TooltipText orgTooltip =
                         Traverse.Create(LastDragHoverCard).Field("MyTooltip").GetValue<TooltipText>();
+#endif
                     if (orgTooltip != null) orgTooltip.TooltipContent = LastDragHoverCardOrgTooltipContent;
                     LastDragHoverCard = null;
                 }
 
+#if MELON_LOADER
+                CardOnCardAction action = __instance.PossibleAction;
+#else
                 CardOnCardAction action = Traverse.Create(__instance).Field("PossibleAction")
                     .GetValue<CardOnCardAction>();
+#endif
                 if (action == null) return;
                 InGameCardBase currentCard = __instance.ContainedLiquid ?? __instance;
                 if (action.ProducedCards != null)
@@ -143,7 +180,11 @@ namespace CstiDetailedCardProgress
                 texts.Add(FormatCardOnCardAction(action, currentCard, droppedCard));
                 if (texts.Count > 0)
                 {
+#if MELON_LOADER
+                    TooltipText orgTooltip = __instance.MyTooltip;
+#else
                     TooltipText orgTooltip = Traverse.Create(__instance).Field("MyTooltip").GetValue<TooltipText>();
+#endif
                     LastDragHoverCardOrgTooltipContent = __instance.Content;
                     LastDragHoverCard = __instance;
                     orgTooltip.TooltipContent =
@@ -206,7 +247,7 @@ namespace CstiDetailedCardProgress
                 }
                 else
                 {
-                    texts.Add(FormatTooltipEntry(cardModel.ObjectWeight, cardModel.CardName, 2));
+                    texts.Add(FormatTooltipEntry(cardModel.ObjectWeight, cardModel.CardName.ToString(), 2));
                     if ((bool)graphicsM && graphicsM.CharacterWindow.HasCardEquipped(__instance))
                         texts.Add(FormatTooltipEntry(cardModel.WeightReductionWhenEquipped,
                             new LocalizedString
@@ -228,7 +269,7 @@ namespace CstiDetailedCardProgress
                         }, 2));
                     if (__instance.ContainedLiquid)
                         texts.Add(FormatTooltipEntry(__instance.ContainedLiquid.CurrentWeight,
-                            __instance.ContainedLiquid.CardModel.CardName, 4));
+                            __instance.ContainedLiquid.CardModel.CardName.ToString(), 4));
                     if (__instance.CardsInInventory != null)
                     {
                         if (__instance.MaxWeightCapacity > 0)
@@ -240,7 +281,7 @@ namespace CstiDetailedCardProgress
                         for (int i = 0; i < __instance.CardsInInventory.Count; i++)
                             if (__instance.CardsInInventory.get_Item(i) != null && !__instance.CardsInInventory.get_Item(i).IsFree)
                                 texts.Add(FormatTooltipEntry(__instance.CardsInInventory.get_Item(i).CurrentWeight,
-                                    $"{__instance.CardsInInventory.get_Item(i).CardAmt}x {__instance.CardsInInventory.get_Item(i).MainCard.CardModel.CardName}",
+                                    $"{__instance.CardsInInventory.get_Item(i).CardAmt}x {__instance.CardsInInventory.get_Item(i).MainCard.CardModel.CardName.ToString()}",
                                     4));
                     }
 
@@ -253,7 +294,7 @@ namespace CstiDetailedCardProgress
                             }, 4));
                     else if (cardModel.ContentWeightReduction != 0)
                         texts.Add(FormatTooltipEntry(cardModel.ContentWeightReduction,
-                            $"{cardModel.CardName} {new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Reduction", DefaultText = "Reduction" }}",
+                            $"{cardModel.CardName.ToString()} {new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Reduction", DefaultText = "Reduction" }.ToString()}",
                             4));
                 }
             }
@@ -331,7 +372,7 @@ namespace CstiDetailedCardProgress
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.SpoilageChange.x ?? 0) != 0)
                     texts.Add(FormatRateEntry(recipeStateChange?.SpoilageChange.x ?? 0,
-                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
+                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }.ToString()} {changeRecipe.ActionName}"));
             }
 
             // liquid spoilage temp fix
@@ -371,7 +412,7 @@ namespace CstiDetailedCardProgress
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.SpoilageChange.x ?? 0) != 0)
                     texts.Add(FormatRateEntry(recipeStateChange?.SpoilageChange.x ?? 0,
-                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
+                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }.ToString()} {changeRecipe.ActionName}"));
             }
 
             if (cardModel.UsageDurability &&
@@ -408,7 +449,7 @@ namespace CstiDetailedCardProgress
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.UsageChange.x ?? 0) != 0)
                     texts.Add(FormatRateEntry(recipeStateChange?.UsageChange.x ?? 0,
-                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
+                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }.ToString()} {changeRecipe.ActionName}"));
             }
 
             if (cardModel.FuelCapacity &&
@@ -442,7 +483,7 @@ namespace CstiDetailedCardProgress
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.FuelChange.x ?? 0) != 0)
                     texts.Add(FormatRateEntry(recipeStateChange?.FuelChange.x ?? 0,
-                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
+                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }.ToString()} {changeRecipe.ActionName}"));
             }
 
             if (cardModel.Progress && cardModel.Progress.Show(__instance.ContainedLiquid, __instance.CurrentProgress))
@@ -476,13 +517,13 @@ namespace CstiDetailedCardProgress
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.ChargesChange.x ?? 0) != 0)
                     texts.Add(FormatRateEntry(recipeStateChange?.ChargesChange.x ?? 0,
-                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
+                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }.ToString()} {changeRecipe.ActionName}"));
             }
 
             if (__instance.IsLiquidContainer && __instance.ContainedLiquid)
             {
                 texts.Add(FormatProgressAndRate(__instance.ContainedLiquid.CurrentLiquidQuantity,
-                    cardModel.MaxLiquidCapacity, __instance.ContainedLiquidModel.CardName
+                    cardModel.MaxLiquidCapacity, __instance.ContainedLiquidModel.CardName.ToString()
                     , recipeStateChange?.ModifyLiquid ?? false ? __instance.ContainedLiquid.CurrentEvaporationRate + (recipeStateChange?.LiquidQuantityChange.x ?? 0) : __instance.ContainedLiquid.CurrentEvaporationRate));
                 if (cardModel.LiquidEvaporationRate != 0)
                     texts.Add(FormatRateEntry(cardModel.LiquidEvaporationRate,
@@ -496,10 +537,10 @@ namespace CstiDetailedCardProgress
                         if (!__instance.CurrentProducedLiquids.get_Item(i).IsEmpty &&
                             !(__instance.CurrentProducedLiquids.get_Item(i).LiquidCard != __instance.ContainedLiquidModel))
                             texts.Add(FormatRateEntry(__instance.CurrentProducedLiquids.get_Item(i).Quantity.x,
-                                $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Producing", DefaultText = "Producing" }} {__instance.CurrentProducedLiquids.get_Item(i).LiquidCard.CardName}"));
+                                $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Producing", DefaultText = "Producing" }.ToString()} {__instance.CurrentProducedLiquids.get_Item(i).LiquidCard.CardName.ToString()}"));
                 if ((recipeStateChange?.ModifyLiquid ?? false) && (recipeStateChange?.LiquidQuantityChange.x ?? 0) != 0)
                     texts.Add(FormatRateEntry(recipeStateChange?.LiquidQuantityChange.x ?? 0,
-                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
+                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }.ToString()} {changeRecipe.ActionName}"));
             }
 
             if (cardModel.SpecialDurability1 &&
@@ -532,7 +573,7 @@ namespace CstiDetailedCardProgress
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.Special1Change.x ?? 0) != 0)
                     texts.Add(FormatRateEntry(recipeStateChange?.Special1Change.x ?? 0,
-                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
+                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }.ToString()} {changeRecipe.ActionName}"));
             }
 
             if (cardModel.SpecialDurability2 &&
@@ -565,7 +606,7 @@ namespace CstiDetailedCardProgress
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.Special2Change.x ?? 0) != 0)
                     texts.Add(FormatRateEntry(recipeStateChange?.Special2Change.x ?? 0,
-                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
+                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }.ToString()} {changeRecipe.ActionName}"));
             }
 
             if (cardModel.SpecialDurability3 &&
@@ -598,7 +639,7 @@ namespace CstiDetailedCardProgress
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.Special3Change.x ?? 0) != 0)
                     texts.Add(FormatRateEntry(recipeStateChange?.Special3Change.x ?? 0,
-                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
+                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }.ToString()} {changeRecipe.ActionName}"));
             }
 
             if (cardModel.SpecialDurability4 &&
@@ -631,7 +672,7 @@ namespace CstiDetailedCardProgress
                             { LocalizationKey = "CstiDetailedCardProgress.Equipped", DefaultText = "Equipped" }));
                 if ((recipeStateChange?.Special4Change.x ?? 0) != 0)
                     texts.Add(FormatRateEntry(recipeStateChange?.Special4Change.x ?? 0,
-                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }} {changeRecipe.ActionName}"));
+                        $"{new LocalizedString { LocalizationKey = "CstiDetailedCardProgress.Recipe", DefaultText = "Recipe" }.ToString()} {changeRecipe.ActionName}"));
             }
 
             if (texts.Count > 0)
