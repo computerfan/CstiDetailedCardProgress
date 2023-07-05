@@ -14,11 +14,11 @@ env:
   projectName: 'CstiDetailedCardProgress'
   outputPath: "bin\\Release"
   RESOURCE_URL: '${{ secrets.GAMEASSEMBLYDOWNLOADPATH }}'
+  IL2CPP_RESOURCE_URL: '${{ secrets.IL2CPP_GAMEASSEMBLYDOWNLOADPATH }}'
   DOWNLOAD_PATH: '.\\res.zip'
 
 jobs:
-  build:
-
+  build_bepinex_mono:
     runs-on: windows-latest
 
     steps:
@@ -69,3 +69,57 @@ jobs:
       with:
         name: CstiDetailedCardProgress-${{steps.get-version.outputs.version}}
         path: ./artifact/
+
+  build_melon_il2cpp_android:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Get version
+      id: get-version
+      shell: pwsh
+      run: |
+        $version = git describe --tags
+        $version = $version -replace "^v", "" -replace '([0-9]+\.?)-([0-9]+)-(.+)', '$1-$2.$3'
+        echo "version=$version" >> $env:GITHUB_OUTPUT
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Download Game Assembly
+      run: |
+        $progressPreference = 'SilentlyContinue'
+        Invoke-WebRequest -Uri $env:IL2CPP_RESOURCE_URL -OutFile $env:DOWNLOAD_PATH
+    - name: Extract Game Assembly
+      run: Expand-Archive -Path "$env:DOWNLOAD_PATH" -DestinationPath "$env:gameAssemblyPath" -Force
+    - name: Build
+      shell: pwsh
+      run: |
+        $projectPath = "$env:projectName.csproj"
+        $outputPath = "$env:outputPath"
+        $GameAssemblyPath = "$env:gameAssemblyPath"
+        $BepInExPluginVersion = "${{steps.get-version.outputs.version}}" -replace '-([0-9]+).(.+)', ''
+        dotnet build $projectPath --configuration Release-MelonLoader /p:GameAssemblyPath=$GameAssemblyPath /p:MelonLoaderAssemblyPath=$GameAssemblyPath /p:AssemblyUnhollowerAssemblyPath=$GameAssemblyPath /p:Version=${{steps.get-version.outputs.version}} /p:BepInExPluginVersion=$BepInExPluginVersion --output $outputPath
+    - name: Copy artifact
+      shell: pwsh
+      run: |
+        $sourceFiles = @(
+            ".\$env:outputPath\CstiDetailedCardProgress.dll",
+            ".\README.md",
+            ".\LICENSE"
+        )
+        New-Item -ItemType Directory -Force -Path .\artifact
+        foreach ($file in $sourceFiles) {
+          Copy-Item -Path "$file" -Destination .\artifact
+        }
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: CstiDetailedCardProgress_Android-${{steps.get-version.outputs.version}}
+        path: ./artifact/
+
