@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
+using UnityEngine;
 using static CstiDetailedCardProgress.Utils;
 
 namespace CstiDetailedCardProgress
@@ -41,6 +43,23 @@ namespace CstiDetailedCardProgress
 #endif
                 // Traverse.Create(__instance).Method("CancelTooltip").GetValue();
                 Tooltip.AddTooltip(EncounterTooltip);
+            }
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(EncounterPopup), "DisplayPlayerActions")]
+        public static void OnEncounterDisplayPlayerActionsPatch(EncounterPopup __instance)
+        {
+            var encounter = __instance.CurrentEncounter;
+            var actionTexts = encounter.EncounterModel.EnemyActions.Where(a => a != null && !a.DoesNotAttack).Select(a => FormatEnemyHitResult(encounter, a, __instance, 1));
+            if (actionTexts.Count() > 0 && !actionTexts.All(string.IsNullOrEmpty))
+            {
+                __instance.AddToLog(new($"如果我被敌人击中，我可能会受伤:（平均情况下）"));
+                __instance.AddToLog(new(string.Join("\n", actionTexts)));
+            }
+            else
+            {
+                __instance.AddToLog(new("我自信它伤不到我！（平均情况下）"));
             }
         }
 
