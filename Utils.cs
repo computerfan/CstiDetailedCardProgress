@@ -17,7 +17,6 @@ public static class Utils
 
     public static string FormatEncounterPlayerAction(EncounterPlayerAction action, EncounterPopup popup, int actionIndex)
     {
-#if MELON_LOADER
         MeleeClashResultsReport backupCurrentRoundMeleeClashResult = popup.CurrentRoundMeleeClashResult;
         RangedClashResultReport backupCurrentRoundRangedClashResult = popup.CurrentRoundRangedClashResult;
         float num = popup.CalculateActionClashChance(action);
@@ -25,18 +24,6 @@ public static class Utils
         RangedClashResultReport currentRoundRangedClashResult = popup.CurrentRoundRangedClashResult;
         popup.CurrentRoundMeleeClashResult = backupCurrentRoundMeleeClashResult;
         popup.CurrentRoundRangedClashResult = backupCurrentRoundRangedClashResult;
-#else
-        Traverse popupRef = Traverse.Create(popup);
-        MeleeClashResultsReport backupCurrentRoundMeleeClashResult = popupRef.Field("CurrentRoundMeleeClashResult").GetValue<MeleeClashResultsReport>();
-        RangedClashResultReport backupCurrentRoundRangedClashResult = popupRef.Field("CurrentRoundRangedClashResult").GetValue<RangedClashResultReport>();
-        float num = popupRef.Method("CalculateActionClashChance", action).GetValue<float>(action);
-        MeleeClashResultsReport currentRoundMeleeClashResult = popupRef
-            .Field("CurrentRoundMeleeClashResult").GetValue<MeleeClashResultsReport>();
-        RangedClashResultReport currentRoundRangedClashResult = popupRef
-            .Field("CurrentRoundRangedClashResult").GetValue<RangedClashResultReport>();
-        popupRef.Field("CurrentRoundMeleeClashResult").SetValue(backupCurrentRoundMeleeClashResult);
-        popupRef.Field("CurrentRoundRangedClashResult").SetValue(backupCurrentRoundRangedClashResult);
-#endif
 
         return action.ActionRange switch
         {

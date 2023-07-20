@@ -25,21 +25,10 @@ namespace CstiDetailedCardProgress
             if (!string.IsNullOrWhiteSpace(newContent))
             {
                 EncounterTooltip.TooltipTitle = __instance.Title;
-#if MELON_LOADER
                 string orgContent = __instance.MyTooltip == null ? "" : __instance.MyTooltip.TooltipContent;
-#else
-                string orgContent = Traverse.Create(__instance).Field("MyTooltip").Field("TooltipContent")
-                    .GetValue<string>();
-#endif
                 EncounterTooltip.TooltipContent = orgContent + (string.IsNullOrEmpty(orgContent) ? "" : "\n") +
                                                   "<size=70%>" + newContent + "</size>";
-#if MELON_LOADER
                 EncounterTooltip.HoldText = __instance.MyTooltip == null ? "" : __instance.MyTooltip.HoldText;
-#else
-                EncounterTooltip.HoldText =
-                    Traverse.Create(__instance).Field("MyTooltip").Field("HoldText").GetValue<string>();
-#endif
-                // Traverse.Create(__instance).Method("CancelTooltip").GetValue();
                 Tooltip.AddTooltip(EncounterTooltip);
             }
         }
