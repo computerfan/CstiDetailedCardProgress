@@ -153,22 +153,12 @@ namespace CstiDetailedCardProgress
 
                 if (LastDragHoverCard != null)
                 {
-#if MELON_LOADER
                     TooltipText orgTooltip = LastDragHoverCard.MyTooltip;
-#else
-                    TooltipText orgTooltip =
-                        Traverse.Create(LastDragHoverCard).Field("MyTooltip").GetValue<TooltipText>();
-#endif
                     if (orgTooltip != null) orgTooltip.TooltipContent = LastDragHoverCardOrgTooltipContent;
                     LastDragHoverCard = null;
                 }
 
-#if MELON_LOADER
                 CardOnCardAction action = __instance.PossibleAction;
-#else
-                CardOnCardAction action = Traverse.Create(__instance).Field("PossibleAction")
-                    .GetValue<CardOnCardAction>();
-#endif
                 if (action == null) return;
                 InGameCardBase currentCard = __instance.ContainedLiquid ?? __instance;
                 if (action.ProducedCards != null)
@@ -180,11 +170,8 @@ namespace CstiDetailedCardProgress
                 texts.Add(FormatCardOnCardAction(action, currentCard, droppedCard));
                 if (texts.Count > 0)
                 {
-#if MELON_LOADER
+
                     TooltipText orgTooltip = __instance.MyTooltip;
-#else
-                    TooltipText orgTooltip = Traverse.Create(__instance).Field("MyTooltip").GetValue<TooltipText>();
-#endif
                     LastDragHoverCardOrgTooltipContent = __instance.Content;
                     LastDragHoverCard = __instance;
                     orgTooltip.TooltipContent =

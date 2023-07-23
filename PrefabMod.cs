@@ -11,13 +11,7 @@ internal class PrefabMod
         // make weather card inspect-able
         if (Plugin.WeatherCardInspectable)
         {
-#if MELON_LOADER
             CardGraphics graphics = CardVisualsManager.Instance.WeatherCardVisualsPrefab;
-#else
-            CardGraphics graphics = Traverse.CreateWithType("CardVisualsManager").Property("Instance")
-                .Field("WeatherCardVisualsPrefab")
-                .GetValue<CardGraphics>();
-#endif
 
             // pre-1.04 patch
             if (graphics == null)

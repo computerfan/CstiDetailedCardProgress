@@ -45,6 +45,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="BepInEx.Core" Version="5.4.17" />
 		<PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
 		<PackageReference Include="UnityEngine.Modules" Version="2019.4.35" IncludeAssets="compile" />
@@ -57,6 +61,7 @@
 	<ItemGroup>
 		<Reference Include="Assembly-CSharp">
 			<HintPath>$(GameAssemblyPath)\Assembly-CSharp.dll</HintPath>
+			<Publicize Condition="'$(Configuration)'!='Release-MelonLoader' and '$(Configuration)'!='Debug-MelonLoader'">true</Publicize>
 		</Reference>
 		<Reference Include="Unity.TextMeshPro">
 			<HintPath>$(GameAssemblyPath)\Unity.TextMeshPro.dll</HintPath>

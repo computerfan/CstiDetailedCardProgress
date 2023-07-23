@@ -16,20 +16,15 @@ internal class Action
         if (!Plugin.Enabled) return;
         List<string> texts = new();
         GameManager gm = GameManager.Instance;
-        CollectionDropReport dropReport =
-#if MELON_LOADER
-            __instance.DropReport;
-#else
-            Traverse.Create(__instance).Field("DropReport").GetValue<CollectionDropReport>();
-#endif
+        CollectionDropReport dropReport = __instance.DropReport;
+
         if (dropReport.FromCard != null && dropReport.FromAction != null &&
             dropReport.FromAction.HasSuccessfulDrop &&
             dropReport.DropsInfo.Length > 0) texts.Add(FormatCardDropList(dropReport, dropReport.FromCard));
         InspectionPopup popup = __instance.GetComponentInParent<InspectionPopup>();
         ExplorationPopup explorationPopup = __instance.GetComponentInParent<ExplorationPopup>();
-#if MELON_LOADER
         BlueprintConstructionPopup blueprintConstructionPopup = __instance.GetComponentInParent<BlueprintConstructionPopup>();
-#endif
+
         InGameCardBase currentCard = null;
         DismantleCardAction action = null;
         if (popup && popup.CurrentCard)
@@ -38,19 +33,9 @@ internal class Action
             if (currentCard.IsBlueprintInstance)
             {
                 if (__instance.Index == -2)
-#if MELON_LOADER
                     action = blueprintConstructionPopup.CurrentBuildAction;
-#else
-                    action = Traverse.Create(popup).Field("CurrentBuildAction").GetValue<DismantleCardAction>();
-#endif
-
                 else if (__instance.Index == -1)
-#if MELON_LOADER
                     action = blueprintConstructionPopup.CurrentDeconstructAction;
-#else
-                    action = Traverse.Create(popup).Field("CurrentDeconstructAction")
-                        .GetValue<DismantleCardAction>();
-#endif
             }
             else if (__instance.Index > -1 && __instance.Index < currentCard.DismantleActions.Length)
             {
@@ -59,12 +44,7 @@ internal class Action
         }
         else if (explorationPopup && explorationPopup.ExplorationCard)
         {
-#if MELON_LOADER
             if (__instance.name == "Button" || explorationPopup.CurrentPhase != 0) return;
-#else
-            if (__instance.name == "Button" ||
-                            Traverse.Create(explorationPopup).Field("CurrentPhase").GetValue<int>() != 0) return;
-#endif
             currentCard = explorationPopup.ExplorationCard;
             action = currentCard.CardModel?.DismantleActions.get_Item(0);
             if (action != null)
@@ -122,21 +102,10 @@ internal class Action
         if (!string.IsNullOrWhiteSpace(newContent))
         {
             ActionTooltip.TooltipTitle = __instance.Title;
-#if MELON_LOADER
             string orgContent = __instance.MyTooltip.TooltipContent;
-#else
-            string orgContent = Traverse.Create(__instance).Field("MyTooltip").Field("TooltipContent")
-                .GetValue<string>();
-#endif
             ActionTooltip.TooltipContent = orgContent + (string.IsNullOrEmpty(orgContent) ? "" : "\n") +
                                            "<size=70%>" + newContent + "</size>";
-#if MELON_LOADER
             ActionTooltip.HoldText = __instance.MyTooltip.HoldText;
-#else
-            ActionTooltip.HoldText =
-                Traverse.Create(__instance).Field("MyTooltip").Field("HoldText").GetValue<string>();
-            // Traverse.Create(__instance).Method("CancelTooltip").GetValue();
-#endif
             Tooltip.AddTooltip(ActionTooltip);
         }
     }

@@ -21,7 +21,6 @@ public static class Utils
 
     public static string FormatEncounterPlayerAction(EncounterPlayerAction action, EncounterPopup popup, int actionIndex)
     {
-#if MELON_LOADER
         MeleeClashResultsReport backupCurrentRoundMeleeClashResult = popup.CurrentRoundMeleeClashResult;
         RangedClashResultReport backupCurrentRoundRangedClashResult = popup.CurrentRoundRangedClashResult;
         float num = popup.CalculateActionClashChance(action);
