@@ -36,3 +36,24 @@ CstiDetailedCardProgress.Action.CurrentExploration,Current Exploration,当前探
 CstiDetailedCardProgress.Action.ExplorationValue,Explored,探索值
 CstiDetailedCardProgress.statOnFullTitle,On Full,在为满时
 CstiDetailedCardProgress.statOnZeroTitle,On Zero,在为空时
+CstiDetailedCardProgress.WeaponStats,Weapon Stats,武器属性
+CstiDetailedCardProgress.WeaponStats.Clash,Clash,攻击力
+CstiDetailedCardProgress.WeaponStats.Damage,Damage,伤害
+CstiDetailedCardProgress.WeaponStats.Reach,Reach,距离
+CstiDetailedCardProgress.Encounter.PlayerActionPreviewTitle,Action Preview,行动预览
+CstiDetailedCardProgress.Encounter.ClashRatio,Clash Ratio,战力比
+CstiDetailedCardProgress.Encounter.PlayerSuccessChance,Player Success Chance,玩家行动成功率
+CstiDetailedCardProgress.Encounter.EnemySuccessChance,Enemy Success Chance,敌人行动成功率
+CstiDetailedCardProgress.Encounter.Damage,Damage,伤害力
+CstiDetailedCardProgress.Encounter.DamageStatSum,Stats Damage Bonus,状态伤害加成
+CstiDetailedCardProgress.Encounter.MeleeSizeDamage,Melee Damage Size Bonus,近战体型伤害加成
+CstiDetailedCardProgress.Encounter.DamageTypes,Damage Types,伤害类型
+CstiDetailedCardProgress.Encounter.ProbableHitBodyParts,Likely to Hit,可能命中
+CstiDetailedCardProgress.Encounter.DistanceChange,Distance Change,距离变化
+CstiDetailedCardProgress.Encounter.CurrentEnemyStats,Current Enemy Stats,当前敌人状态
+CstiDetailedCardProgress.BodyParts.Head,Head,头部
+CstiDetailedCardProgress.BodyParts.Torso,Torso,躯干
+CstiDetailedCardProgress.BodyParts.LArm,Left Arm,左臂
+CstiDetailedCardProgress.BodyParts.RArm,Right Arm,右臂
+CstiDetailedCardProgress.BodyParts.LLeg,Left Leg,左腿
+CstiDetailedCardProgress.BodyParts.RLeg,Right Leg,右腿
