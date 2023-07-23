@@ -39,15 +39,28 @@ internal class Encounter
     {
         InGameEncounter encounter = __instance.CurrentEncounter;
         IEnumerable<string> actionTexts = encounter.EncounterModel.EnemyActions
-            .Where(a => a != null && !a.DoesNotAttack).Select(a => FormatEnemyHitResult(encounter, a, __instance, 1));
-        if (actionTexts.Count() > 0 && !actionTexts.All(string.IsNullOrEmpty))
+            .Where(a => a is { DoesNotAttack: false }).Select(a => FormatEnemyHitResult(encounter, a, __instance, 1));
+        
+        if (actionTexts.Any() && !actionTexts.All(string.IsNullOrEmpty))
         {
-            __instance.AddToLog(new EncounterLogMessage("如果我被敌人击中，我可能会受伤:（平均情况下）"));
-            __instance.AddToLog(new EncounterLogMessage(string.Join("\n", actionTexts)));
+            __instance.AddToLog(new EncounterLogMessage
+            {
+                LogText = new LocalizedString
+                    { LocalizationKey = "CstiDetailedCardProgress.Encounter.PossibleWoundsHint", DefaultText = "If I am hit by an enemy, I might get hurt: (on average)" }
+            });
+            __instance.AddToLog(new EncounterLogMessage
+            {
+                LogText = new LocalizedString
+                    { LocalizationKey = "IGNOREKEY", DefaultText = string.Join("\n", actionTexts) }
+            });
         }
         else
         {
-            __instance.AddToLog(new EncounterLogMessage("我自信它伤不到我！（平均情况下）"));
+            __instance.AddToLog(new EncounterLogMessage
+            {
+                LogText = new LocalizedString
+                    { LocalizationKey = "CstiDetailedCardProgress.Encounter.ImpossibleWoundsHint", DefaultText = "I am confident it can't hurt me! (on average)" }
+            });
         }
     }
 
@@ -68,7 +81,13 @@ internal class Encounter
 
         EncounterPlayerDamageReport report = __instance.CurrentRoundPlayerDamageReport;
         if (report.AttackSeverity > WoundSeverity.NoWound)
-            __instance.AddToLog(new EncounterLogMessage(SeverityText(report.AttackSeverity)));
+            __instance.AddToLog(
+                new EncounterLogMessage
+                {
+                    LogText = new LocalizedString
+                        { LocalizationKey = "IGNOREKEY", DefaultText = SeverityText(report.AttackSeverity) }
+                }
+            );
     }
 
     [HarmonyPostfix]

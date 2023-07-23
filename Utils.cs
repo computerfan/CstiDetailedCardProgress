@@ -10,6 +10,32 @@ namespace CstiDetailedCardProgress;
 public static class Utils
 {
 #if MELON_LOADER
+public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, WoundSeverity _WoundSeverity, List<PlayerWound> _List)
+  {
+    switch (_WoundSeverity)
+    {
+      case WoundSeverity.Minor:
+        if (playerWounds.MinorWounds == null)
+          break;
+        _List.AddRange(playerWounds.MinorWounds);
+        break;
+      case WoundSeverity.Medium:
+        if (playerWounds.MediumWounds == null)
+          break;
+        _List.AddRange(playerWounds.MediumWounds);
+        break;
+      case WoundSeverity.Serious:
+        if (playerWounds.SeriousWounds == null)
+          break;
+        _List.AddRange(playerWounds.SeriousWounds);
+        break;
+      default:
+        if (playerWounds.UnharmedResults == null)
+          break;
+        _List.AddRange(playerWounds.UnharmedResults);
+        break;
+    }
+  }
 #else
     public static T get_Item<T>(this List<T> list, int index)
     {
@@ -51,7 +77,7 @@ public static class Utils
                 $" 敌人攻击命中率: {enemySuccess * 100f:0.##}%{(commonClashResult.EnemyCannotFail ? " <color=red>(必定命中)</color>" : "")}");
             if (action.AssociatedCard)
                 foreach (PlayerEncounterVariable stat in action.AssociatedCard.CardModel.WeaponClashStatInfluences)
-                    summary.AppendLine($"  {stat.Stat.GameName}: {FormatMinMaxValue(stat.GenerateRandomRange())}");
+                    summary.AppendLine($"  {stat.Stat.GameName.ToString()}: {FormatMinMaxValue(stat.GenerateRandomRange())}");
             if (!action.DoesNotAttack)
             {
                 Vector2 damage = action.Damage;
@@ -62,11 +88,13 @@ public static class Utils
                 summary.AppendLine($" 状态伤害加成: {FormatMinMaxValue(damageStatSum)}");
                 if (action.AssociatedCard)
                     foreach (PlayerEncounterVariable stat in action.AssociatedCard.CardModel.WeaponDamageStatInfluences)
-                        summary.AppendLine($"  {stat.Stat.GameName}: {FormatMinMaxValue(stat.GenerateRandomRange())}");
+                        summary.AppendLine($"  {stat.Stat.GameName.ToString()}: {FormatMinMaxValue(stat.GenerateRandomRange())}");
                 summary.AppendLine($" 近战体型伤害加成: {ColorFloat(popup.PlayerSize)}");
-                summary.AppendLine($" 伤害类型: {string.Join(", ", action.DamageTypes.Select(t => t.Name))}");
-                EncounterPlayerDamageReport damageReport = default;
-                damageReport.SizeDefense = encounter.CurrentEnemySize;
+                summary.AppendLine($" 伤害类型: {action.DamageTypes.Select(t => t.Name.ToString()).Join()}");
+                EncounterPlayerDamageReport damageReport = new()
+                {
+                    SizeDefense = encounter.CurrentEnemySize
+                };
 
                 summary.AppendLine(" 可命中部位:")
                     .AppendLine(
@@ -84,7 +112,7 @@ public static class Utils
 
                 float playerSuccess = currentRoundRangedClashResult.PlayerSuccessChance;
                 float enemySuccess = currentRoundRangedClashResult.EnemySuccessChance;
-                Debug.Log($"不精确度: {action.ClashInaccuracy}");
+                // Debug.Log($"不精确度: {action.ClashInaccuracy}");
                 summary.AppendLine($"玩家命中率: {playerSuccess * 100f:0.##}%");
                 summary.AppendLine($"敌人命中率: {enemySuccess * 100f:0.##}%");
             }
@@ -108,11 +136,11 @@ public static class Utils
                 summary.AppendLine($" 状态伤害加成: {FormatMinMaxValue(damageStatSum)}");
                 if (action.AssociatedCard)
                     foreach (PlayerEncounterVariable stat in action.AssociatedCard.CardModel.WeaponDamageStatInfluences)
-                        summary.AppendLine($"  {stat.Stat.GameName}: {FormatMinMaxValue(stat.GenerateRandomRange())}");
+                        summary.AppendLine($"  {stat.Stat.GameName.ToString()}: {FormatMinMaxValue(stat.GenerateRandomRange())}");
                 if (action.AmmoCard)
                     foreach (PlayerEncounterVariable stat in action.AmmoCard.CardModel.WeaponDamageStatInfluences)
-                        summary.AppendLine($"  {stat.Stat.GameName}: {FormatMinMaxValue(stat.GenerateRandomRange())}");
-                summary.AppendLine($" 伤害类型: {string.Join(", ", action.DamageTypes.Select(t => t.Name))}");
+                        summary.AppendLine($"  {stat.Stat.GameName.ToString()}: {FormatMinMaxValue(stat.GenerateRandomRange())}");
+                summary.AppendLine($" 伤害类型: {action.DamageTypes.Select(t => t.Name.ToString()).Join()}");
                 summary.AppendLine(" 可命中部位:")
                     .AppendLine($"{FormatPlayerHitResult(encounter, action, popup, damage + damageStatSum)}");
             }
@@ -156,9 +184,9 @@ public static class Utils
                 _FromEncounter.EnemyHidden ? _ActionsList[i].EnemyHiddenWeightModifier : 0;
             result.Actions[i].PlayerHiddenWeightMod =
                 _FromEncounter.PlayerHidden ? _ActionsList[i].PlayerHiddenWeightModifier : 0;
-            result.Actions[i].StatWeightMods = new List<StatDropWeightModReport>();
+            result.Actions[i].StatWeightMods = new();
             _ActionsList[i].GetStatWeightMods(_FromEncounter.EncounterModel, result.Actions[i].StatWeightMods);
-            result.Actions[i].CardWeightMods = new List<CardDropWeightModReport>();
+            result.Actions[i].CardWeightMods = new();
             _ActionsList[i].GetCardWeightMods(result.Actions[i].CardWeightMods);
             result.Actions[i].ValuesWeightMods =
                 new EnemyValuesWeightModReport(_ActionsList[i].ValuesWeightModifiers, _FromEncounter);
@@ -281,7 +309,7 @@ public static class Utils
                 WoundSeverity = WoundSeverity.Serious
             });
             IOrderedEnumerable<(Vector2, WoundSeverity WoundSeverity)> attackRanges =
-                (from m in mappings select (m.AttackDefenseRatio * enemyDefenses[i], m.WoundSeverity)).OrderBy(a =>
+                mappings.Select(m => (m.AttackDefenseRatio * enemyDefenses[i], m.WoundSeverity)).OrderBy(a =>
                     a.WoundSeverity);
             woundMappings.Add(attackRanges.ToList());
         }
@@ -314,7 +342,7 @@ public static class Utils
                 }
 
                 result.AppendLine(
-                    $"{spaces}{bodyPartName}: {resultReport.GetBodyLocationHitWeight(bodyPart) / resultReport.TotalWeight * 100f:0}% (总防御: {enemyDefenses[(int)bodyPart]:0})");
+                    $"{spaces}{bodyPartName.ToString()}: {resultReport.GetBodyLocationHitWeight(bodyPart) / resultReport.TotalWeight * 100f:0}% (总防御: {enemyDefenses[(int)bodyPart]:0})");
                 result.AppendLine(
                     $"{spaces}| {string.Join(" | ", mapping.Select(m => $"{VectorMath.RangeIntersect(playerActionDamage, m.Item1).RangeLength() / playerActionDamage.RangeLength() * 100f:0}%"))} |");
             }
@@ -339,18 +367,18 @@ public static class Utils
             PlayerClashStatsAddedValues = action.GetClashStatsAddedValues(_WithRandomness)
         };
         bool ranged = encounter.Distant;
-        Debug.Log(action.GetClash(true));
+        // Debug.Log(action.GetClash(true));
         result.AppendLine($"{spaces}基础值: {report.PlayerActionClashValue:0}")
             .AppendLine(
                 $"{spaces}体型加成: {(action.ActionRange == ActionRange.Ranged ? 0.0f : report.PlayerSizeClashValue):0}")
             .AppendLine($"{spaces}武器长度加成: {report.PlayerActionReachClashValue}");
         if (report.PlayerClashStatsAddedValues != null && report.PlayerClashStatsAddedValues.Count > 0)
             result.AppendLine(
-                $"{spaces}状态加成:\n{string.Join("\n", report.PlayerClashStatsAddedValues.Select(v => $"{spaces} {v.Stat.GameName}: {ColorFloat(v.Value)}"))}");
+                $"{spaces}状态加成:\n{string.Join("\n", report.PlayerClashStatsAddedValues.ToArray().Select(v => $"{spaces} {v.Stat.GameName.ToString()}: {ColorFloat(v.Value)}"))}");
         if (encounter.PlayerHidden)
         {
             report.PlayerClashStealthBonus = action.GetClashStealthBonus(_WithRandomness);
-            Debug.Log(action.GetClashStealthBonus(true));
+            // Debug.Log(action.GetClashStealthBonus(true));
             result.AppendLine($"{spaces}潜行加成: <color=green>{report.PlayerClashStealthBonus:0}</color>");
         }
 
@@ -358,7 +386,7 @@ public static class Utils
             (ranged && action.ActionRange == ActionRange.Melee))
         {
             report.PlayerClashIneffectiveRangeMalus = action.GetClashIneffectiveRangeMalus(_WithRandomness);
-            Debug.Log(action.GetClashIneffectiveRangeMalus(true));
+            // Debug.Log(action.GetClashIneffectiveRangeMalus(true));
             result.AppendLine($"{spaces}无效范围减成: <color=red>{report.PlayerClashIneffectiveRangeMalus:0}</color>");
         }
 
@@ -378,16 +406,15 @@ public static class Utils
         StringBuilder result = new();
         GameManager gm = GameManager.Instance;
         PlayerBodyLocationSelectionReport playerBodyLocationHit = default;
-        EncounterEnemyDamageReport currentRoundEnemyDamageReport = default;
+        EncounterEnemyDamageReport currentRoundEnemyDamageReport = new();
 
-        BodyLocations[] bodyParts = new[]
-        {
+        BodyLocations[] bodyParts = {
             BodyLocations.Head, BodyLocations.Torso, BodyLocations.LArm, BodyLocations.RArm, BodyLocations.LLeg,
             BodyLocations.RLeg
         };
         float[] bodyPartArmors = new float[bodyParts.Length];
         float[] armors = new float[bodyParts.Length];
-
+        
         if (action.ActionRange == ActionRange.Melee)
         {
             playerBodyLocationHit.Ranged = false;
@@ -408,43 +435,43 @@ public static class Utils
             playerBodyLocationHit.BaseWeights.RLeg = popup.RLeg.RangedHitChanceWeight;
             if (popup.CurrentEncounter.Distant && gm && gm.CoverCards != null)
                 for (int i = 0; i < gm.CoverCards.Count; i++)
-                    if (!gm.CoverCards[i].CardModel.AppliesCoverWhenEquipped ||
-                        (gm.CoverCards[i].CardModel.AppliesCoverWhenEquipped &&
-                         GraphicsManager.Instance.CharacterWindow.HasCardEquipped(gm.CoverCards[i])))
+                    if (!gm.CoverCards.get_Item(i).CardModel.AppliesCoverWhenEquipped ||
+                        (gm.CoverCards.get_Item(i).CardModel.AppliesCoverWhenEquipped &&
+                         GraphicsManager.Instance.CharacterWindow.HasCardEquipped(gm.CoverCards.get_Item(i))))
                     {
-                        playerBodyLocationHit.CoverWeights.Head = gm.CoverCards[i].CardModel
+                        playerBodyLocationHit.CoverWeights.Head = gm.CoverCards.get_Item(i).CardModel
                             .PlayerCoverHitProbabilityModifiers.HeadHitProbabilityModifier;
-                        playerBodyLocationHit.CoverWeights.Torso = gm.CoverCards[i].CardModel
+                        playerBodyLocationHit.CoverWeights.Torso = gm.CoverCards.get_Item(i).CardModel
                             .PlayerCoverHitProbabilityModifiers.TorsoHitProbabilityModifier;
-                        playerBodyLocationHit.CoverWeights.LArm = gm.CoverCards[i].CardModel
+                        playerBodyLocationHit.CoverWeights.LArm = gm.CoverCards.get_Item(i).CardModel
                             .PlayerCoverHitProbabilityModifiers.LArmHitProbabilityModifier;
-                        playerBodyLocationHit.CoverWeights.RArm = gm.CoverCards[i].CardModel
+                        playerBodyLocationHit.CoverWeights.RArm = gm.CoverCards.get_Item(i).CardModel
                             .PlayerCoverHitProbabilityModifiers.RArmHitProbabilityModifier;
-                        playerBodyLocationHit.CoverWeights.LLeg = gm.CoverCards[i].CardModel
+                        playerBodyLocationHit.CoverWeights.LLeg = gm.CoverCards.get_Item(i).CardModel
                             .PlayerCoverHitProbabilityModifiers.LLegHitProbabilityModifier;
-                        playerBodyLocationHit.CoverWeights.RLeg = gm.CoverCards[i].CardModel
+                        playerBodyLocationHit.CoverWeights.RLeg = gm.CoverCards.get_Item(i).CardModel
                             .PlayerCoverHitProbabilityModifiers.RLegHitProbabilityModifier;
                     }
         }
 
         if (gm && gm.ArmorCards != null)
             for (int j = 0; j < gm.ArmorCards.Count; j++)
-                if (GraphicsManager.Instance.CharacterWindow.HasCardEquipped(gm.ArmorCards[j]))
+                if (GraphicsManager.Instance.CharacterWindow.HasCardEquipped(gm.ArmorCards.get_Item(j)))
                 {
                     playerBodyLocationHit.ArmorWeights.Head +=
-                        gm.ArmorCards[j].CardModel.ArmorValues.HeadHitProbabilityModifier;
+                        gm.ArmorCards.get_Item(j).CardModel.ArmorValues.HeadHitProbabilityModifier;
                     playerBodyLocationHit.ArmorWeights.Torso +=
-                        gm.ArmorCards[j].CardModel.ArmorValues.TorsoHitProbabilityModifier;
+                        gm.ArmorCards.get_Item(j).CardModel.ArmorValues.TorsoHitProbabilityModifier;
                     playerBodyLocationHit.ArmorWeights.LArm +=
-                        gm.ArmorCards[j].CardModel.ArmorValues.LArmHitProbabilityModifier;
+                        gm.ArmorCards.get_Item(j).CardModel.ArmorValues.LArmHitProbabilityModifier;
                     playerBodyLocationHit.ArmorWeights.RArm +=
-                        gm.ArmorCards[j].CardModel.ArmorValues.RArmHitProbabilityModifier;
+                        gm.ArmorCards.get_Item(j).CardModel.ArmorValues.RArmHitProbabilityModifier;
                     playerBodyLocationHit.ArmorWeights.LLeg +=
-                        gm.ArmorCards[j].CardModel.ArmorValues.LLegHitProbabilityModifier;
+                        gm.ArmorCards.get_Item(j).CardModel.ArmorValues.LLegHitProbabilityModifier;
                     playerBodyLocationHit.ArmorWeights.RLeg +=
-                        gm.ArmorCards[j].CardModel.ArmorValues.RLegHitProbabilityModifier;
+                        gm.ArmorCards.get_Item(j).CardModel.ArmorValues.RLegHitProbabilityModifier;
                     for (int k = 0; k < bodyParts.Length; k++)
-                        armors[k] += gm.ArmorCards[j].CardModel.ArmorValues
+                        armors[k] += gm.ArmorCards.get_Item(j).CardModel.ArmorValues
                             .CalculateArmorForLocation(action.DamageTypes, bodyParts[k]);
                 }
 
@@ -462,7 +489,7 @@ public static class Utils
             action.AddedPlayerLocationHitProbabilities.RLegHitProbabilityModifier;
 
         // 计算玩家护甲
-        Debug.Log(string.Join(",", action.DamageTypes.Select(t => t.Name)));
+        // Debug.Log(string.Join(",", action.DamageTypes.Select(t => t.Name)));
         foreach (BodyLocations bodyPart in bodyParts)
             bodyPartArmors[(int)bodyPart] = popup.GetBodyLocation(bodyPart).GetArmor(action.DamageTypes);
 
@@ -481,7 +508,7 @@ public static class Utils
         currentRoundEnemyDamageReport.ValuesDamage = action.AddedDamageFromEnemyValues(encounter, false);
         currentRoundEnemyDamageReport.WoundsDamage = action.AddedDamageValueFromWounds(encounter, false);
         currentRoundEnemyDamageReport.StatsAddedDamage = action.AddedDamageFromStats(false);
-
+        
         // 计算敌人可造成的伤口
         List<List<Tuple<Vector2, WoundSeverity>>> woundMappings = new();
         for (int i = 0; i < bodyParts.Length; i++)
@@ -499,7 +526,7 @@ public static class Utils
                     new Vector2(mappings[mappings.Count - 1].AttackDefenseRatio.y, float.PositiveInfinity),
                 WoundSeverity = WoundSeverity.Serious
             });
-            Debug.Log(string.Join("\n", mappings.Select(m => $"{m.WoundSeverity}: {m.AttackDefenseRatio}")));
+            // Debug.Log(string.Join("\n", mappings.Select(m => $"{m.WoundSeverity}: {m.AttackDefenseRatio}")));
             IOrderedEnumerable<Tuple<Vector2, WoundSeverity>> attackRanges =
                 (from m in mappings
                     select new Tuple<Vector2, WoundSeverity>(m.AttackDefenseRatio * armors[i], m.WoundSeverity))
@@ -509,19 +536,25 @@ public static class Utils
 
         foreach (BodyLocations bodyPart in bodyParts)
         {
-            Debug.Log(string.Join(",", armors));
+            // Debug.Log(string.Join(",", armors));
             currentRoundEnemyDamageReport.ArmorDefense = armors[(int)bodyPart];
             WoundSeverity woundSeverity = popup.GenerateWoundSeverity(currentRoundEnemyDamageReport.EnemyDamage,
                 currentRoundEnemyDamageReport.PlayerDefense);
             currentRoundEnemyDamageReport.AttackSeverity = woundSeverity;
             List<PlayerWound> wounds = new();
+#if MELON_LOADER
+            action.PlayerWounds.GetWoundsForSeverity_il2cpp(woundSeverity, wounds);
+            if (wounds.Count == 0)
+                encounter.EncounterModel.DefaultPlayerWounds.GetWoundsForSeverity_il2cpp(woundSeverity, wounds);
+#else
             action.PlayerWounds.GetWoundsForSeverity(woundSeverity, ref wounds);
             if (wounds.Count == 0)
                 encounter.EncounterModel.DefaultPlayerWounds.GetWoundsForSeverity(woundSeverity, ref wounds);
+#endif
             if (wounds[0].DroppedCards.Length == 0) return "";
             if (playerBodyLocationHit.GetBodyLocationHitWeight(bodyPart) > 0)
                 result.AppendLine(
-                    $"{new string(' ', indent)}{new LocalizedString { LocalizationKey = $"CstiDetailedCardProgress.BodyParts.{bodyPart}" }}({playerBodyLocationHit.GetBodyLocationHitWeight(bodyPart) / playerBodyLocationHit.TotalWeight * 100f:0.#}%): {string.Join(",", wounds.Select(w => w.DroppedCards[0].CardName))} (攻防比: {currentRoundEnemyDamageReport.EnemyDamage}:{currentRoundEnemyDamageReport.PlayerDefense})");
+                    $"{new string(' ', indent)}{new LocalizedString { LocalizationKey = $"CstiDetailedCardProgress.BodyParts.{bodyPart}" }.ToString()}({playerBodyLocationHit.GetBodyLocationHitWeight(bodyPart) / playerBodyLocationHit.TotalWeight * 100f:0.#}%): {wounds.Select(w => w.DroppedCards[0].CardName.ToString()).Join()} (攻防比: {currentRoundEnemyDamageReport.EnemyDamage}:{currentRoundEnemyDamageReport.PlayerDefense})");
         }
 
         return result.ToString();

@@ -57,3 +57,5 @@ CstiDetailedCardProgress.BodyParts.LArm,Left Arm,左臂
 CstiDetailedCardProgress.BodyParts.RArm,Right Arm,右臂
 CstiDetailedCardProgress.BodyParts.LLeg,Left Leg,左腿
 CstiDetailedCardProgress.BodyParts.RLeg,Right Leg,右腿
+CstiDetailedCardProgress.Encounter.PossibleWoundsHint,If I am hit by an enemy, I might get hurt: (on average),如果我被敌人击中，我可能会受伤:（平均情况下）
+CstiDetailedCardProgress.Encounter.ImpossibleWoundsHint,I am confident it can't hurt me! (on average),我自信它伤不到我！（平均情况下）
