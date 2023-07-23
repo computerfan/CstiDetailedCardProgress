@@ -53,6 +53,24 @@ namespace CstiDetailedCardProgress
         }
 
         [HarmonyPostfix]
+        [HarmonyPatch(typeof(EncounterPopup), "GenerateEnemyWound")]
+        public static void PostGenerateEnemyWoundPatch(EncounterPopup __instance)
+        {
+            static string SeverityText(WoundSeverity s) => s switch
+            {
+                WoundSeverity.Minor => "本轮伤害: 轻微",
+                WoundSeverity.Medium => "本轮伤害: 中等",
+                WoundSeverity.Serious => "本轮伤害: 沉重",
+                _ => ""
+            };
+            var report = __instance.CurrentRoundPlayerDamageReport;
+            if (report.AttackSeverity > WoundSeverity.NoWound)
+            {
+                __instance.AddToLog(new(SeverityText(report.AttackSeverity)));
+            }
+        }
+
+        [HarmonyPostfix]
         [HarmonyPatch(typeof(TooltipProvider), "OnHoverExit")]
         public static void EncounterOptionButtonOnHoverExitPatch(EncounterOptionButton __instance)
         {

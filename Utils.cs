@@ -28,17 +28,7 @@ public static class Utils
         RangedClashResultReport currentRoundRangedClashResult = popup.CurrentRoundRangedClashResult;
         popup.CurrentRoundMeleeClashResult = backupCurrentRoundMeleeClashResult;
         popup.CurrentRoundRangedClashResult = backupCurrentRoundRangedClashResult;
-#else
-        Traverse popupRef = Traverse.Create(popup);
-        MeleeClashResultsReport backupCurrentRoundMeleeClashResult = popupRef.Field("CurrentRoundMeleeClashResult").GetValue<MeleeClashResultsReport>();
-        RangedClashResultReport backupCurrentRoundRangedClashResult = popupRef.Field("CurrentRoundRangedClashResult").GetValue<RangedClashResultReport>();
-        float num = popupRef.Method("CalculateActionClashChance", action).GetValue<float>(action);
-        MeleeClashResultsReport currentRoundMeleeClashResult = popupRef
-            .Field("CurrentRoundMeleeClashResult").GetValue<MeleeClashResultsReport>();
-        RangedClashResultReport currentRoundRangedClashResult = popupRef
-            .Field("CurrentRoundRangedClashResult").GetValue<RangedClashResultReport>();
-        popupRef.Field("CurrentRoundMeleeClashResult").SetValue(backupCurrentRoundMeleeClashResult);
-        popupRef.Field("CurrentRoundRangedClashResult").SetValue(backupCurrentRoundRangedClashResult);
+
         var commonClashResult = action.ActionRange switch
         {
             ActionRange.Melee => currentRoundMeleeClashResult.CommonClashReport,
@@ -46,21 +36,19 @@ public static class Utils
             _ => currentRoundMeleeClashResult.CommonClashReport
         };
 
-        var actionRef = Traverse.Create(action);
         var encounter = popup.CurrentEncounter;
 
         var summary = new StringBuilder($"<size=85%>行动预览 {encounter.EnemyName}</size>\n");
         summary.AppendLine($"玩家行动: {action.ActionName}");
         if (action.ActionRange == ActionRange.Melee)
         {
-            var reportRef = Traverse.Create(currentRoundMeleeClashResult);
-            var playerSuccess = reportRef.Property<float>("PlayerPercentChance").Value;
-            var enemySuccess = reportRef.Property<float>("EnemyPercentChance").Value;
+            var playerSuccess = currentRoundMeleeClashResult.PlayerPercentChance;
+            var enemySuccess = currentRoundMeleeClashResult.EnemyPercentChance;
             summary.AppendLine($" 战力比: {currentRoundMeleeClashResult.CommonClashReport.PlayerClashValue:0.#} : {currentRoundMeleeClashResult.CommonClashReport.EnemyClashValue:0.#}");
             if (!action.DoesNotAttack)
             {
-                var damage = actionRef.Field<Vector2>("Damage").Value;
-                var damageStatSum = actionRef.Field<Vector2>("DamageStatSum").Value;
+                var damage = action.Damage;
+                var damageStatSum = action.DamageStatSum;
                 var sizeDamage = new Vector2(popup.PlayerSize, popup.PlayerSize);
 
                 summary.AppendLine($" 伤害力: {FormatMinMaxValue(damage)}");
@@ -88,8 +76,8 @@ public static class Utils
             summary.AppendLine($"玩家命中率: {playerSuccess * 100f:0.##}%");
             summary.AppendLine($"敌人命中率: {enemySuccess * 100f:0.##}%");
 
-            var damage = actionRef.Field<Vector2>("Damage").Value;
-            var damageStatSum = actionRef.Field<Vector2>("DamageStatSum").Value;
+            var damage = action.Damage;
+            var damageStatSum = action.DamageStatSum;
             if (!action.DoesNotAttack)
             {
                 summary.AppendLine($" 基础伤害力: {FormatMinMaxValue(damage)}");
@@ -119,7 +107,6 @@ public static class Utils
             .AppendLine($" 潜行: {encounter.CurrentEnemyStealth}");
 
         return summary.ToString();
-#endif
     }
     public static EnemyActionSelectionReport GenEnemyActionSelection(InGameEncounter _FromEncounter, List<EnemyAction> _ActionsList)
     {
