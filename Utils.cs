@@ -45,6 +45,8 @@ public static class Utils
             var playerSuccess = currentRoundMeleeClashResult.PlayerPercentChance;
             var enemySuccess = currentRoundMeleeClashResult.EnemyPercentChance;
             summary.AppendLine($" 战力比: {currentRoundMeleeClashResult.CommonClashReport.PlayerClashValue:0.#} : {currentRoundMeleeClashResult.CommonClashReport.EnemyClashValue:0.#}");
+            summary.AppendLine($" 玩家攻击击中率: {playerSuccess * 100f:0.##}%{(commonClashResult.PlayerCannotFail ? " <color=green>(必定命中)</color>" : "")}");
+            summary.AppendLine($" 敌人攻击命中率: {enemySuccess * 100f:0.##}%{(commonClashResult.EnemyCannotFail ? " <color=red>(必定命中)</color>" : "")}");
             if (action.AssociatedCard)
             {
                 foreach (var stat in action.AssociatedCard.CardModel.WeaponClashStatInfluences)
@@ -70,20 +72,30 @@ public static class Utils
 
                 summary.AppendLine($" 可命中部位:").AppendLine($"{FormatPlayerHitResult(encounter, action, popup, damage + damageStatSum + sizeDamage)}");
             }
-            summary.AppendLine($" 玩家攻击击中率: {playerSuccess * 100f:0.##}%{(commonClashResult.PlayerCannotFail ? " <color=green>(必定命中)</color>" : "")}");
-            summary.AppendLine($" 敌人攻击命中率: {enemySuccess * 100f:0.##}%{(commonClashResult.EnemyCannotFail ? " <color=red>(必定命中)</color>" : "")}");
             summary.AppendLine($" 距离变化: {GetDistanceChangeText(action.DistanceChange)}");
         }
         else if (action.ActionRange == ActionRange.Ranged)
         {
+            if (encounter.Distant)
+            {
+                summary.AppendLine($" 战力比: {currentRoundRangedClashResult.PlayerClashValue:0.#} : {currentRoundRangedClashResult.EnemyClashValue:0.#}");
 
-            summary.AppendLine($" 战力比: {currentRoundMeleeClashResult.CommonClashReport.PlayerClashValue:0.#} : {currentRoundMeleeClashResult.CommonClashReport.EnemyClashValue:0.#}");
+                var playerSuccess = currentRoundRangedClashResult.PlayerSuccessChance;
+                var enemySuccess = currentRoundRangedClashResult.EnemySuccessChance;
+                Debug.Log($"不精确度: {action.ClashInaccuracy}");
+                summary.AppendLine($"玩家命中率: {playerSuccess * 100f:0.##}%");
+                summary.AppendLine($"敌人命中率: {enemySuccess * 100f:0.##}%");
+            }
+            else
+            {
+                summary.AppendLine($" 战力比: {currentRoundMeleeClashResult.CommonClashReport.PlayerClashValue:0.#} : {currentRoundMeleeClashResult.CommonClashReport.EnemyClashValue:0.#}");
 
-            var playerSuccess = currentRoundRangedClashResult.PlayerSuccessChance;
-            var enemySuccess = currentRoundRangedClashResult.EnemySuccessChance;
+                var playerSuccess = currentRoundMeleeClashResult.PlayerPercentChance;
+                var enemySuccess = currentRoundMeleeClashResult.EnemyPercentChance;
 
-            summary.AppendLine($"玩家命中率: {playerSuccess * 100f:0.##}%");
-            summary.AppendLine($"敌人命中率: {enemySuccess * 100f:0.##}%");
+                summary.AppendLine($"玩家命中率: {playerSuccess * 100f:0.##}%");
+                summary.AppendLine($"敌人命中率: {enemySuccess * 100f:0.##}%");
+            }
 
             var damage = action.Damage;
             var damageStatSum = action.DamageStatSum;
@@ -296,6 +308,12 @@ public static class Utils
             report.PlayerClashIneffectiveRangeMalus = action.GetClashIneffectiveRangeMalus(_WithRandomness);
             Debug.Log(action.GetClashIneffectiveRangeMalus(true));
             result.AppendLine($"{spaces}无效范围减成: <color=red>{report.PlayerClashIneffectiveRangeMalus:0}</color>");
+        }
+        if (action.ActionRange == ActionRange.Ranged)
+        {
+            result.AppendLine($"{spaces}敌人体型减成: {ColorFloat(-encounter.CurrentEnemySize)}");
+            result.AppendLine($"{spaces}不精确度减成: {ColorFloat(-action.ClashInaccuracy.y)}");
+            result.AppendLine($"{spaces}敌人掩体减成: {ColorFloat(-encounter.CurrentEnemyCover)}");
         }
         return result.ToString();
     }
