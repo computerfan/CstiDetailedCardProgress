@@ -115,7 +115,7 @@ public static class Utils
             .AppendLine($" 远程技能: {encounter.CurrentEnemyRangedSkill}")
             .AppendLine($" 潜行: {encounter.CurrentEnemyStealth}");
 
-        summary.AppendLine($"战力详细数据:\n{FormatPlayerClashValue(encounter, action, encounter.EncounterModel.EnemyActions.Where(a => a != null && !a.DoesNotAttack).Single(), popup)}");
+        summary.AppendLine($"战力详细数据:\n{FormatPlayerClashValue(encounter, action, popup)}");
         return summary.ToString();
     }
     public static EnemyActionSelectionReport GenEnemyActionSelection(InGameEncounter _FromEncounter, List<EnemyAction> _ActionsList)
@@ -265,7 +265,7 @@ public static class Utils
         // 输出结果
         return result.ToString();
     }
-    public static string FormatPlayerClashValue(InGameEncounter encounter, EncounterPlayerAction action, EnemyAction enemyAction, EncounterPopup popup, int indent = 1)
+    public static string FormatPlayerClashValue(InGameEncounter encounter, EncounterPlayerAction action, EncounterPopup popup, int indent = 1)
     {
         bool _WithRandomness = false;
         var result = new StringBuilder();
@@ -281,7 +281,7 @@ public static class Utils
         bool ranged = encounter.Distant;
         Debug.Log(action.GetClash(true));
         result.AppendLine($"{spaces}基础值: {report.PlayerActionClashValue:0}")
-            .AppendLine($"{spaces}体型加成: {(action.ActionRange==ActionRange.Ranged ? 0.0f : report.PlayerSizeClashValue):0}")
+            .AppendLine($"{spaces}体型加成: {(action.ActionRange == ActionRange.Ranged ? 0.0f : report.PlayerSizeClashValue):0}")
             .AppendLine($"{spaces}武器长度加成: {report.PlayerActionReachClashValue}");
         if (report.PlayerClashStatsAddedValues != null && report.PlayerClashStatsAddedValues.Count > 0)
             result.AppendLine($"{spaces}状态加成:\n{string.Join($"\n", report.PlayerClashStatsAddedValues.Select(v => $"{spaces} {v.Stat.GameName}: {ColorFloat(v.Value)}"))}");
