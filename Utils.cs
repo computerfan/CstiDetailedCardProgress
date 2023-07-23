@@ -38,13 +38,18 @@ public static class Utils
 
         var encounter = popup.CurrentEncounter;
 
-        var summary = new StringBuilder($"<size=85%>行动预览 {encounter.EnemyName}</size>\n");
+        var summary = new StringBuilder($"<size=85%><color=yellow>行动预览 {encounter.EnemyName}</color></size>\n");
         summary.AppendLine($"玩家行动: {action.ActionName}");
         if (action.ActionRange == ActionRange.Melee)
         {
             var playerSuccess = currentRoundMeleeClashResult.PlayerPercentChance;
             var enemySuccess = currentRoundMeleeClashResult.EnemyPercentChance;
             summary.AppendLine($" 战力比: {currentRoundMeleeClashResult.CommonClashReport.PlayerClashValue:0.#} : {currentRoundMeleeClashResult.CommonClashReport.EnemyClashValue:0.#}");
+            if (action.AssociatedCard)
+            {
+                foreach (var stat in action.AssociatedCard.CardModel.WeaponClashStatInfluences)
+                    summary.AppendLine($"  {stat.Stat.GameName}: {FormatMinMaxValue(stat.GenerateRandomRange())}");
+            }
             if (!action.DoesNotAttack)
             {
                 var damage = action.Damage;
@@ -71,8 +76,12 @@ public static class Utils
         }
         else if (action.ActionRange == ActionRange.Ranged)
         {
+
+            summary.AppendLine($" 战力比: {currentRoundMeleeClashResult.CommonClashReport.PlayerClashValue:0.#} : {currentRoundMeleeClashResult.CommonClashReport.EnemyClashValue:0.#}");
+
             var playerSuccess = currentRoundRangedClashResult.PlayerSuccessChance;
             var enemySuccess = currentRoundRangedClashResult.EnemySuccessChance;
+
             summary.AppendLine($"玩家命中率: {playerSuccess * 100f:0.##}%");
             summary.AppendLine($"敌人命中率: {enemySuccess * 100f:0.##}%");
 
@@ -106,6 +115,7 @@ public static class Utils
             .AppendLine($" 远程技能: {encounter.CurrentEnemyRangedSkill}")
             .AppendLine($" 潜行: {encounter.CurrentEnemyStealth}");
 
+        summary.AppendLine($"战力详细数据:\n{FormatPlayerClashValue(encounter, action, encounter.EncounterModel.EnemyActions.Where(a => a != null && !a.DoesNotAttack).Single(), popup)}");
         return summary.ToString();
     }
     public static EnemyActionSelectionReport GenEnemyActionSelection(InGameEncounter _FromEncounter, List<EnemyAction> _ActionsList)
@@ -255,7 +265,40 @@ public static class Utils
         // 输出结果
         return result.ToString();
     }
-
+    public static string FormatPlayerClashValue(InGameEncounter encounter, EncounterPlayerAction action, EnemyAction enemyAction, EncounterPopup popup, int indent = 1)
+    {
+        bool _WithRandomness = false;
+        var result = new StringBuilder();
+        var spaces = new string(' ', indent);
+        var report = new ClashResultsReport
+        {
+            PlayerCannotFail = action.CannotFailClash,
+            PlayerActionClashValue = action.GetClash(_WithRandomness),
+            PlayerSizeClashValue = popup.PlayerSize,
+            PlayerActionReachClashValue = action.Reach,
+            PlayerClashStatsAddedValues = action.GetClashStatsAddedValues(_WithRandomness)
+        };
+        bool ranged = encounter.Distant;
+        Debug.Log(action.GetClash(true));
+        result.AppendLine($"{spaces}基础值: {report.PlayerActionClashValue:0}")
+            .AppendLine($"{spaces}体型加成: {(action.ActionRange==ActionRange.Ranged ? 0.0f : report.PlayerSizeClashValue):0}")
+            .AppendLine($"{spaces}武器长度加成: {report.PlayerActionReachClashValue}");
+        if (report.PlayerClashStatsAddedValues != null && report.PlayerClashStatsAddedValues.Count > 0)
+            result.AppendLine($"{spaces}状态加成:\n{string.Join($"\n", report.PlayerClashStatsAddedValues.Select(v => $"{spaces} {v.Stat.GameName}: {ColorFloat(v.Value)}"))}");
+        if (encounter.PlayerHidden)
+        {
+            report.PlayerClashStealthBonus = action.GetClashStealthBonus(_WithRandomness);
+            Debug.Log(action.GetClashStealthBonus(true));
+            result.AppendLine($"{spaces}潜行加成: <color=green>{report.PlayerClashStealthBonus:0}</color>");
+        }
+        if ((!ranged && action.ActionRange == ActionRange.Ranged) || (ranged && action.ActionRange == ActionRange.Melee))
+        {
+            report.PlayerClashIneffectiveRangeMalus = action.GetClashIneffectiveRangeMalus(_WithRandomness);
+            Debug.Log(action.GetClashIneffectiveRangeMalus(true));
+            result.AppendLine($"{spaces}无效范围减成: <color=red>{report.PlayerClashIneffectiveRangeMalus:0}</color>");
+        }
+        return result.ToString();
+    }
     public static string FormatEnemyHitResult(InGameEncounter encounter, EnemyAction action, EncounterPopup popup, int indent = 2)
     {
         var result = new StringBuilder();
@@ -326,7 +369,7 @@ public static class Utils
         playerBodyLocationHit.EnemyActionWeights.RLeg += action.AddedPlayerLocationHitProbabilities.RLegHitProbabilityModifier;
 
         // 计算玩家护甲
-        // Debug.Log(string.Join(",", action.DamageTypes.Select(t => t.Name)));
+        Debug.Log(string.Join(",", action.DamageTypes.Select(t => t.Name)));
         foreach (var bodyPart in bodyParts)
             bodyPartArmors[(int)bodyPart] = popup.GetBodyLocation(bodyPart).GetArmor(action.DamageTypes);
 
@@ -356,13 +399,14 @@ public static class Utils
             var mappings = popup.WoundSeverityMappings.ToList();
             mappings.Insert(0, new() { AttackDefenseRatio = new(0f, mappings[0].AttackDefenseRatio.x), WoundSeverity = WoundSeverity.NoWound });
             mappings.Add(new() { AttackDefenseRatio = new(mappings[mappings.Count - 1].AttackDefenseRatio.y, float.PositiveInfinity), WoundSeverity = WoundSeverity.Serious });
+            Debug.Log(string.Join("\n", mappings.Select(m => $"{m.WoundSeverity}: {m.AttackDefenseRatio}")));
             var attackRanges = (from m in mappings select new Tuple<Vector2, WoundSeverity>(m.AttackDefenseRatio * armors[i], m.WoundSeverity)).OrderBy(a => a.Item2);
             woundMappings.Add(attackRanges.ToList());
         }
 
         foreach (var bodyPart in bodyParts)
         {
-            // Debug.Log(string.Join(",", armors));
+            Debug.Log(string.Join(",", armors));
             currentRoundEnemyDamageReport.ArmorDefense = armors[(int)bodyPart];
             WoundSeverity woundSeverity = popup.GenerateWoundSeverity(currentRoundEnemyDamageReport.EnemyDamage, currentRoundEnemyDamageReport.PlayerDefense);
             currentRoundEnemyDamageReport.AttackSeverity = woundSeverity;
