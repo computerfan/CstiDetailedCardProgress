@@ -102,10 +102,10 @@ internal class Action
         if (!string.IsNullOrWhiteSpace(newContent))
         {
             ActionTooltip.TooltipTitle = __instance.Title;
-            string orgContent = __instance.MyTooltip.TooltipContent;
+            string orgContent = __instance.MyTooltip?.TooltipContent;
             ActionTooltip.TooltipContent = orgContent + (string.IsNullOrEmpty(orgContent) ? "" : "\n") +
                                            "<size=70%>" + newContent + "</size>";
-            ActionTooltip.HoldText = __instance.MyTooltip.HoldText;
+            ActionTooltip.HoldText = __instance.MyTooltip?.HoldText ?? "";
             Tooltip.AddTooltip(ActionTooltip);
         }
     }
