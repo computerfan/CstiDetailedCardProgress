@@ -875,11 +875,11 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
                 statOnFullZeroTitle = FormatBasicEntry(new LocalizedString
                         { LocalizationKey = "CstiDetailedCardProgress.statOnZeroTitle", DefaultText = "On Zero" }
                     .ToString(), "", indent: 4);
-                InGameCardBase currentWeatherCard = GameManager.Instance.CurrentWeatherCard;
-                if (currentCard.CardModel.CardType == CardTypes.Weather) GameManager.Instance.CurrentWeatherCard = null;
+                bool uniqueOnBoard = currentCard.CardModel.UniqueOnBoard;
+                if (currentCard.CardModel.CardType == CardTypes.Weather) currentCard.CardModel.UniqueOnBoard = false;
                 CollectionDropReport collectionDropsReport =
                     GameManager.Instance.GetCollectionDropsReport(stat.OnZero, currentCard, false);
-                GameManager.Instance.CurrentWeatherCard = currentWeatherCard;
+                currentCard.CardModel.UniqueOnBoard = uniqueOnBoard;
                 dropList = Action.FormatCardDropList(
                     collectionDropsReport, currentCard,
                     action: stat.OnZero, indent: 6);
