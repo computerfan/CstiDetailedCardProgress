@@ -37,6 +37,7 @@ internal class Encounter
     [HarmonyPatch(typeof(EncounterPopup), "DisplayPlayerActions")]
     public static void OnEncounterDisplayPlayerActionsPatch(EncounterPopup __instance)
     {
+        if (!Plugin.Enabled || !Plugin.AdditionalEncounterLogMessage) return;
         InGameEncounter encounter = __instance.CurrentEncounter;
         IEnumerable<string> actionTexts = encounter.EncounterModel.EnemyActions
             .Where(a => a is { DoesNotAttack: false }).Select(a => FormatEnemyHitResult(encounter, a, __instance, 1));

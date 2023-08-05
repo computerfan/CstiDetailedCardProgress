@@ -31,6 +31,7 @@ The configuration file can be found at /BepInEx/config/CstiDetailedCardProgress.
 |HideImpossibleDropSet|true|If true, impossible drop sets will be hidden.|
 |TooltipNextPageHotKey|RightBracket|The key to show next page of the tool tip.|
 |TooltipPreviousPageHotKey|LeftBracket|The key to show previous page of the tool tip.|
+|AdditionalEncounterLogMessage|false|If true, shows additional tips in the message log of combat encounter.|
 
 __Toggle Note__: When using the hotkey to enable/disable the detailed tooltips, the tooltips will not be updated until the user moves the mouse off of a card.
 

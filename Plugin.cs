@@ -5,6 +5,7 @@ using BepInEx;
 #endif
 using System;
 using System.Collections.Generic;
+using BepInEx.Configuration;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
@@ -40,6 +41,8 @@ namespace CstiDetailedCardProgress
         public static bool HideImpossibleDropSet;
         public static KeyCode TooltipNextPageHotKey;
         public static KeyCode TooltipPreviousPageHotKey;
+        public static bool AdditionalEncounterLogMessage;
+        
 
         public static InGameCardBase LastDragHoverCard;
         public static string LastDragHoverCardOrgTooltipContent;
@@ -52,6 +55,7 @@ namespace CstiDetailedCardProgress
         private MelonPreferences_Entry<KeyCode> HotKeyEntry;
         private MelonPreferences_Entry<bool> RecipesShowTargetDurationEntry;
         private MelonPreferences_Entry<bool> HideImpossibleDropSetEntry;
+        private MelonPreferences_Entry<bool> AdditionalEncounterLogMessageEntry;
         public override void OnInitializeMelon()
         {
             GeneralPreferencesCategory = MelonPreferences.CreateCategory("General");
@@ -68,11 +72,15 @@ namespace CstiDetailedCardProgress
  TweakPreferencesCategory.CreateEntry(nameof(RecipesShowTargetDuration), false, "If true, will show the target duration of recipes");
             HideImpossibleDropSetEntry =
  TweakPreferencesCategory.CreateEntry(nameof(HideImpossibleDropSet), true, "If true, will hide the impossible drop set");
+            AdditionalEncounterLogMessageEntry = TweakPreferencesCategory.CreateEntry(
+                nameof(AdditionalEncounterLogMessage), false,
+                "If true, shows additional tips in the message log of combat encounter.");
             Enabled = EnabledEntry.Value; 
             HotKey = HotKeyEntry.Value;
             WeatherCardInspectable = WeatherCardInspectableEntry.Value;
             RecipesShowTargetDuration = RecipesShowTargetDurationEntry.Value;
             HideImpossibleDropSet = HideImpossibleDropSetEntry.Value;
+            AdditionalEncounterLogMessage = AdditionalEncounterLogMessageEntry.Value;
 
             HarmonyLib.Harmony.CreateAndPatchAll(typeof(Plugin));
             HarmonyLib.Harmony.CreateAndPatchAll(typeof(Stat));
@@ -89,6 +97,8 @@ namespace CstiDetailedCardProgress
             LoggerInstance.Msg($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
 #else
+        public static ConfigEntry<bool> AdditionalEncounterLogMessageEntry;
+
         private void Awake()
         {
             Enabled = Config.Bind("General", nameof(Enabled), true, "If true, will show the tool tips.").Value;
@@ -105,6 +115,9 @@ namespace CstiDetailedCardProgress
                 "The key to show next page of the tool tip.").Value;
             TooltipPreviousPageHotKey = Config.Bind("Tooltip", nameof(TooltipPreviousPageHotKey), KeyCode.LeftBracket,
                 "The key to show previous page of the tool tip.").Value;
+            AdditionalEncounterLogMessageEntry = Config.Bind("General", nameof(AdditionalEncounterLogMessage), false,
+                "If true, shows additional tips in the message log of combat encounter.");
+            AdditionalEncounterLogMessage = AdditionalEncounterLogMessageEntry.Value;
 
             // Plugin startup logic
             Harmony.CreateAndPatchAll(typeof(Plugin));
