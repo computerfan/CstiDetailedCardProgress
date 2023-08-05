@@ -37,9 +37,15 @@ internal class Action
                 else if (__instance.Index == -1)
                     action = blueprintConstructionPopup.CurrentDeconstructAction;
             }
-            else if (__instance.Index > -1 && __instance.Index < currentCard.DismantleActions.Length)
+            else if (__instance.Index > -1 && __instance.Index < currentCard.DismantleActions.Length + (popup.CurrentCard.CardModel.CannotEmpty ? -1 : 0))
             {
                 action = currentCard.DismantleActions[__instance.Index];
+            }
+            else if (popup.CurrentCard.ContainedLiquid && __instance.Index >= currentCard.DismantleActions.Length + (popup.CurrentCard.CardModel.CannotEmpty ? -1 : 0) &&
+                     __instance.Index < currentCard.DismantleActions.Length + (popup.CurrentCard.CardModel.CannotEmpty ? -1 : 0) + popup.CurrentCard.DismantleActions.Length)
+            {
+                action = popup.CurrentCard.DismantleActions[__instance.Index - (currentCard.DismantleActions.Length + (popup.CurrentCard.CardModel.CannotEmpty ? -1 : 0))];
+                currentCard = popup.CurrentCard;
             }
         }
         else if (explorationPopup && explorationPopup.ExplorationCard)

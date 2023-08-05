@@ -747,6 +747,16 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
                     .ToString(),
                 fromCard.CardModel.CardName.ToString(), "red", indent + 2));
         }
+        
+        if (fromCard.ContainedLiquid && stateChange.ModifyLiquid)
+        {
+            cardModTexts.Add(FormatBasicEntry(
+                new LocalizedString
+                        { LocalizationKey = "CstiDetailedCardProgress.ModifyLiquid", DefaultText = "Modify Liquid" }
+                    .ToString(), "", indent: indent + 2));
+            cardModTexts.Add(FormatBasicEntry(
+                FormatMinMaxValue(stateChange.LiquidQuantityChange), fromCard.ContainedLiquidModel.CardName, indent: indent + 4));
+        }
 
         return cardModTexts.Join(delimiter: "\n");
     }

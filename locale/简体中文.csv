@@ -29,6 +29,7 @@ CstiDetailedCardProgress.CardStateChange,,卡牌状态变更
 CstiDetailedCardProgress.Action.CardDrops,,卡牌掉落
 CstiDetailedCardProgress.TransformInto,,转变为
 CstiDetailedCardProgress.Destroy,,销毁
+CstiDetailedCardProgress.ModifyLiquid,Modify Liquid,修改液体
 CstiDetailedCardProgress.Action.LiquidDrops,,液体掉落
 CstiDetailedCardProgress.GivenCardStateChange,,发起方卡牌状态变更
 CstiDetailedCardProgress.Action.ExplorationDropsCount,Exploration Drops Count,探索掉落数量
