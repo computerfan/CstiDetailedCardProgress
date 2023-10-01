@@ -21,6 +21,27 @@ internal class Stat
             __instance.SetTooltip(__instance.ModelStatus.GameName, __instance.ModelStatus.Description, "");
     }
 
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AffectedStatInfo), "Setup")]
+    public static void PatchAffectedStatInfoInteractable(AffectedStatInfo __instance, GameStat _Stat)
+    {
+        if (Plugin.ForceInspectStatInfos)
+        {
+            _Stat.CannotBeInspected = false;
+            __instance.InteractionButton.interactable = true;
+        }
+    }
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(StatInfluenceInfo), "SetupStatSource")]
+    public static void PatchStatInfluenceInfoInteractable(StatInfluenceInfo __instance, InGameStat _Stat)
+    {
+        if (Plugin.ForceInspectStatInfos)
+        {
+            _Stat.StatModel.CannotBeInspected = false;
+            __instance.InteractionButton.interactable = true;
+        }
+    }
+
     public static string FormatInGameStat(InGameStat stat)
     {
         List<string> texts = new();
@@ -58,7 +79,7 @@ internal class Stat
         if (stat.StatModel.UsesNovelty && stat.StalenessValues.Count > 0)
         {
             List<string> stalenessText = new();
-            foreach(var staleness in stat.StalenessValues)
+            foreach (var staleness in stat.StalenessValues)
             {
                 if (staleness.Quantity > -1 && stat.StatModel.StalenessMultiplier != 0)
                     stalenessText.Add(FormatBasicEntry(
