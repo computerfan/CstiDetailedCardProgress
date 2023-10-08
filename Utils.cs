@@ -176,7 +176,7 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
         {
             result.Actions[i] = default;
             result.Actions[i].ActionName = new LocalizedString
-                { LocalizationKey = _ActionsList[i].ActionLog.MainLogKey };
+            { LocalizationKey = _ActionsList[i].ActionLog.MainLogKey };
             result.Actions[i].BaseWeight = _ActionsList[i].BaseWeight;
             result.Actions[i].DistanceWeightMod = _FromEncounter.Distant ? _ActionsList[i].DistanceWeightModifier : 0;
             result.Actions[i].CloseWeightMod = _FromEncounter.Distant ? 0 : _ActionsList[i].CloseRangeWeightModifier;
@@ -321,13 +321,13 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
             if (resultReport.GetBodyLocationHitWeight(bodyPart) > 0)
             {
                 LocalizedString bodyPartName = new()
-                    { LocalizationKey = $"CstiDetailedCardProgress.BodyParts.{bodyPart}" };
+                { LocalizationKey = $"CstiDetailedCardProgress.BodyParts.{bodyPart}" };
                 List<(Vector2, WoundSeverity)> mapping = woundMappings[(int)bodyPart];
                 IEnumerable<(WoundSeverity, float)> woundsProbs = from m in mapping
-                    where VectorMath.RangeIntersect(playerActionDamage, m.Item1).RangeLength() > 0
-                    select (m.Item2,
-                        VectorMath.RangeIntersect(playerActionDamage, m.Item1).RangeLength() /
-                        playerActionDamage.RangeLength());
+                                                                  where VectorMath.RangeIntersect(playerActionDamage, m.Item1).RangeLength() > 0
+                                                                  select (m.Item2,
+                                                                      VectorMath.RangeIntersect(playerActionDamage, m.Item1).RangeLength() /
+                                                                      playerActionDamage.RangeLength());
                 foreach ((WoundSeverity, float) woundProb in woundsProbs)
                 {
                     EnemyWound[] wounds = body.GetBodyLocation(bodyPart)
@@ -414,7 +414,7 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
         };
         float[] bodyPartArmors = new float[bodyParts.Length];
         float[] armors = new float[bodyParts.Length];
-        
+
         if (action.ActionRange == ActionRange.Melee)
         {
             playerBodyLocationHit.Ranged = false;
@@ -508,7 +508,7 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
         currentRoundEnemyDamageReport.ValuesDamage = action.AddedDamageFromEnemyValues(encounter, false);
         currentRoundEnemyDamageReport.WoundsDamage = action.AddedDamageValueFromWounds(encounter, false);
         currentRoundEnemyDamageReport.StatsAddedDamage = action.AddedDamageFromStats(false);
-        
+
         // 计算敌人可造成的伤口
         List<List<Tuple<Vector2, WoundSeverity>>> woundMappings = new();
         for (int i = 0; i < bodyParts.Length; i++)
@@ -529,7 +529,7 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
             // Debug.Log(string.Join("\n", mappings.Select(m => $"{m.WoundSeverity}: {m.AttackDefenseRatio}")));
             IOrderedEnumerable<Tuple<Vector2, WoundSeverity>> attackRanges =
                 (from m in mappings
-                    select new Tuple<Vector2, WoundSeverity>(m.AttackDefenseRatio * armors[i], m.WoundSeverity))
+                 select new Tuple<Vector2, WoundSeverity>(m.AttackDefenseRatio * armors[i], m.WoundSeverity))
                 .OrderBy(a => a.Item2);
             woundMappings.Add(attackRanges.ToList());
         }
@@ -641,6 +641,17 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
         List<string> texts = new();
         List<string> stateModTexts = new();
 
+        if (action.UnmodifiedDaytimeCost != action.TotalDaytimeCost)
+        {
+            string timeModText = FormatTimeCostModifiers(action, fromCard, indent);
+            texts.Add(FormatBasicEntry(new LocalizedString()
+            {
+                LocalizationKey = "CstiDetailedCardProgress.TimeCostModifiers",
+                DefaultText = "Time Cost Modifiers"
+            }, "", indent: indent));
+            texts.Add(timeModText);
+        }
+
         if (action.StatModifications != null)
         {
             foreach (StatModifier statModifier in action.AllStatModifiers)
@@ -649,7 +660,7 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
             {
                 texts.Add(FormatBasicEntry(
                     new LocalizedString
-                            { LocalizationKey = "CstiDetailedCardProgress.StatModifier", DefaultText = "Stat Modifier" }
+                    { LocalizationKey = "CstiDetailedCardProgress.StatModifier", DefaultText = "Stat Modifier" }
                         .ToString(),
                     "", indent: indent));
                 texts.Add(stateModTexts.Join(delimiter: "\n"));
@@ -662,9 +673,10 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
         {
             texts.Add(FormatBasicEntry(
                 new LocalizedString
-                    {
-                        LocalizationKey = "CstiDetailedCardProgress.CardStateChange", DefaultText = "Card State Change"
-                    }
+                {
+                    LocalizationKey = "CstiDetailedCardProgress.CardStateChange",
+                    DefaultText = "Card State Change"
+                }
                     .ToString(),
                 "", indent: indent));
             texts.Add(cardModText);
@@ -672,7 +684,26 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
 
         return texts.Join(delimiter: "\n");
     }
-
+    private static string FormatTimeCostModifiers(CardAction action, InGameCardBase fromCard, int indent)
+    {
+        List<string> texts = new();
+        if (action != null)
+        {
+            var gm = MBSingleton<GameManager>.Instance;
+            if (gm.CurrentActionModifiers != null && gm.CurrentActionModifiers.Count > 0)
+            {
+                for (int i = 0; i < gm.CurrentActionModifiers.Count; i++)
+                {
+                    var cur = gm.CurrentActionModifiers[i];
+                    if (cur.AppliesToAction(action, gm.NotInBase, fromCard) && cur.DurationModifier != 0)
+                    {
+                        texts.Add(FormatBasicEntry($"{ColorFloat(cur.DurationModifier)}", $"{cur.Source}", indent: indent + 2));
+                    }
+                }
+            }
+        }
+        return texts.Join(delimiter: "\n");
+    }
     private static string FormatStateChange(CardStateChange stateChange, InGameCardBase fromCard, int indent = 0)
     {
         List<string> cardModTexts = new();
@@ -682,26 +713,26 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
                 cardModTexts.Add(FormatBasicEntry(FormatMinMaxValue(stateChange.SpoilageChange),
                     string.IsNullOrEmpty(fromCard.CardModel.SpoilageTime.CardStatName)
                         ? new LocalizedString
-                                { LocalizationKey = "CstiDetailedCardProgress.Spoilage", DefaultText = "Spoilage" }
+                        { LocalizationKey = "CstiDetailedCardProgress.Spoilage", DefaultText = "Spoilage" }
                             .ToString()
                         : fromCard.CardModel.SpoilageTime.CardStatName, indent: indent + 2));
             if (stateChange.UsageChange.magnitude != 0)
                 cardModTexts.Add(FormatBasicEntry(FormatMinMaxValue(stateChange.UsageChange),
                     string.IsNullOrEmpty(fromCard.CardModel.UsageDurability.CardStatName)
                         ? new LocalizedString
-                            { LocalizationKey = "CstiDetailedCardProgress.Usage", DefaultText = "Usage" }.ToString()
+                        { LocalizationKey = "CstiDetailedCardProgress.Usage", DefaultText = "Usage" }.ToString()
                         : fromCard.CardModel.UsageDurability.CardStatName, indent: indent + 2));
             if (stateChange.FuelChange.magnitude != 0)
                 cardModTexts.Add(FormatBasicEntry(FormatMinMaxValue(stateChange.FuelChange),
                     string.IsNullOrEmpty(fromCard.CardModel.FuelCapacity.CardStatName)
                         ? new LocalizedString
-                            { LocalizationKey = "CstiDetailedCardProgress.Fuel", DefaultText = "Fuel" }.ToString()
+                        { LocalizationKey = "CstiDetailedCardProgress.Fuel", DefaultText = "Fuel" }.ToString()
                         : fromCard.CardModel.FuelCapacity.CardStatName, indent: indent + 2));
             if (stateChange.ChargesChange.magnitude != 0)
                 cardModTexts.Add(FormatBasicEntry(FormatMinMaxValue(stateChange.ChargesChange),
                     string.IsNullOrEmpty(fromCard.CardModel.Progress.CardStatName)
                         ? new LocalizedString
-                                { LocalizationKey = "CstiDetailedCardProgress.Progress", DefaultText = "Progress" }
+                        { LocalizationKey = "CstiDetailedCardProgress.Progress", DefaultText = "Progress" }
                             .ToString()
                         : fromCard.CardModel.Progress.CardStatName, indent: indent + 2));
             if (stateChange.LiquidQuantityChange.magnitude != 0)
@@ -736,7 +767,7 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
         {
             cardModTexts.Add(FormatBasicEntry(
                 new LocalizedString
-                        { LocalizationKey = "CstiDetailedCardProgress.TransformInto", DefaultText = "Transform into" }
+                { LocalizationKey = "CstiDetailedCardProgress.TransformInto", DefaultText = "Transform into" }
                     .ToString(),
                 $"{stateChange.TransformInto.CardName.ToString()}", indent: indent + 2));
         }
@@ -747,12 +778,12 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
                     .ToString(),
                 fromCard.CardModel.CardName.ToString(), "red", indent + 2));
         }
-        
-        if (fromCard.ContainedLiquid && stateChange.ModifyLiquid)
+
+        if (fromCard && fromCard.ContainedLiquid && stateChange.ModifyLiquid)
         {
             cardModTexts.Add(FormatBasicEntry(
                 new LocalizedString
-                        { LocalizationKey = "CstiDetailedCardProgress.ModifyLiquid", DefaultText = "Modify Liquid" }
+                { LocalizationKey = "CstiDetailedCardProgress.ModifyLiquid", DefaultText = "Modify Liquid" }
                     .ToString(), "", indent: indent + 2));
             cardModTexts.Add(FormatBasicEntry(
                 FormatMinMaxValue(stateChange.LiquidQuantityChange), fromCard.ContainedLiquidModel.CardName, indent: indent + 4));
@@ -760,7 +791,16 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
 
         return cardModTexts.Join(delimiter: "\n");
     }
-
+    public static string FormatActionDurationModifiers(ActionModifier modifier, int indent = 0)
+    {
+        List<string> texts = new();
+        if (modifier == null || modifier.AppliesTo == null || modifier.DurationModifier == 0) return "";
+        foreach (var tag in modifier.AppliesTo)
+        {
+            if (tag) texts.Add(FormatBasicEntry(tag.name, ColorFloat(modifier.DurationModifier), indent: indent));
+        }
+        return texts.Join(delimiter: "\n");
+    }
     public static string FormatStatModifier(StatModifier statModifier, int indent = 0)
     {
         List<string> texts = new();
@@ -794,11 +834,11 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
         };
     }
 
-    public static string ColorFloat(float num, bool asPercent = false)
+    public static string ColorFloat(float num, bool asPercent = false, bool reverseColor = false)
     {
         return asPercent
-            ? $"{ColorTagFromFloat(num)}{num,-3:+0.##%;-0.##%;+0}</color>"
-            : $"{ColorTagFromFloat(num)}{num,-3:+0.##;-0.##;+0}</color>";
+            ? $"{ColorTagFromFloat(reverseColor ? -num : num)}{num,-3:+0.##%;-0.##%;+0}</color>"
+            : $"{ColorTagFromFloat(reverseColor ? -num : num)}{num,-3:+0.##;-0.##;+0}</color>";
     }
 
     public static string FormatWeight(float weight)
@@ -854,7 +894,7 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
             if (stat != null && currentCard != null && stat.HasActionOnFull && stat.OnFull != null)
             {
                 statOnFullZeroTitle = FormatBasicEntry(new LocalizedString
-                        { LocalizationKey = "CstiDetailedCardProgress.statOnFullTitle", DefaultText = "On Full" }
+                { LocalizationKey = "CstiDetailedCardProgress.statOnFullTitle", DefaultText = "On Full" }
                     .ToString(), "", indent: 4);
                 CollectionDropReport collectionDropsReport =
                     GameManager.Instance.GetCollectionDropsReport(stat.OnFull, currentCard, false);
@@ -873,7 +913,7 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
             if (stat != null && currentCard != null && stat.HasActionOnZero && stat.OnZero != null)
             {
                 statOnFullZeroTitle = FormatBasicEntry(new LocalizedString
-                        { LocalizationKey = "CstiDetailedCardProgress.statOnZeroTitle", DefaultText = "On Zero" }
+                { LocalizationKey = "CstiDetailedCardProgress.statOnZeroTitle", DefaultText = "On Zero" }
                     .ToString(), "", indent: 4);
                 bool uniqueOnBoard = currentCard.CardModel.UniqueOnBoard;
                 if (currentCard.CardModel.CardType == CardTypes.Weather) currentCard.CardModel.UniqueOnBoard = false;

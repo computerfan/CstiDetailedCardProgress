@@ -27,6 +27,8 @@ internal class Action
 
         InGameCardBase currentCard = null;
         DismantleCardAction action = null;
+        SpecialActionSet actionSet = null;
+
         if (popup && popup.CurrentCard)
         {
             currentCard = popup.CurrentCard.ContainedLiquid ?? popup.CurrentCard;
@@ -91,7 +93,14 @@ internal class Action
                     }));
             }
         }
-
+        else if (popup & popup.CurrentSet)
+        {
+            actionSet = popup.CurrentSet;
+            if (actionSet.name == "TimeSkipOptions" && __instance.Index > -1 && __instance.Index < actionSet.Actions.Length)
+            {
+                action = actionSet.Actions[__instance.Index];
+            }
+        }
         if (action != null)
         {
             if ((dropReport.DropsInfo == null || dropReport.DropsInfo.Length == 0) &&
@@ -170,21 +179,21 @@ internal class Action
                     "<size=55%>" + dropCardTexts + "</size>", indent: 2 + indent));
             texts.Add(FormatBasicEntry($"{report.DropsInfo[i].FinalWeight}/{report.TotalValue}",
                 new LocalizedString
-                    { LocalizationKey = "CstiDetailedCardProgress.Action.Weight", DefaultText = "Weight" }.ToString(),
+                { LocalizationKey = "CstiDetailedCardProgress.Action.Weight", DefaultText = "Weight" }.ToString(),
                 indent: 2 + indent));
             if (report.DropsInfo[i].BaseWeight != 0)
                 texts.Add(FormatTooltipEntry(report.DropsInfo[i].BaseWeight,
                     new LocalizedString
-                        { LocalizationKey = "CstiDetailedCardProgress.Action.Base", DefaultText = "Base" }.ToString(),
+                    { LocalizationKey = "CstiDetailedCardProgress.Action.Base", DefaultText = "Base" }.ToString(),
                     4 + indent));
             if (withStat && report.DropsInfo[i].StatWeightMods != null)
-                foreach(StatDropWeightModReport statmod in report.DropsInfo[i].StatWeightMods)
+                foreach (StatDropWeightModReport statmod in report.DropsInfo[i].StatWeightMods)
                 {
                     if (statmod.BonusWeight != 0)
                         texts.Add(FormatTooltipEntry(statmod.BonusWeight, $"{statmod.Stat.GameName}", 4 + indent));
                 };
             if (withCard && report.DropsInfo[i].CardWeightMods != null)
-                foreach(var cardmod in report.DropsInfo[i].CardWeightMods)
+                foreach (var cardmod in report.DropsInfo[i].CardWeightMods)
                 {
                     if (cardmod.BonusWeight != 0)
                         texts.Add(FormatTooltipEntry(cardmod.BonusWeight, $"{cardmod.Card.CardModel.CardName.ToString()}",
@@ -228,7 +237,8 @@ internal class Action
                     texts.Add(FormatBasicEntry(
                         new LocalizedString
                         {
-                            LocalizationKey = "CstiDetailedCardProgress.StatModifier", DefaultText = "Stat Modifier"
+                            LocalizationKey = "CstiDetailedCardProgress.StatModifier",
+                            DefaultText = "Stat Modifier"
                         }, "", indent: 2 + indent));
                     texts.Add(stateModTexts.Join(delimiter: "\n"));
                 }

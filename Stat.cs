@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using UnityEngine;
 using static CstiDetailedCardProgress.Utils;
@@ -76,6 +77,25 @@ internal class Stat
         texts.Add(FormatRate(stat.SimpleRatePerTick, stat.SimpleCurrentValue, stat.StatModel.MinMaxValue.y,
             stat.StatModel.MinMaxValue.x));
         if (rateModsTexts.Count > 0) texts.Add(rateModsTexts.Join(delimiter: "\n"));
+
+        if (stat.CurrentStatuses != null && stat.CurrentStatuses.Count > 0)
+        {
+            foreach (var status in stat.CurrentStatuses)
+            {
+                if (status == null || status.EffectsOnActions == null) continue;
+                texts.Add(FormatBasicEntry(new LocalizedString()
+                {
+                    LocalizationKey = "CstiDetailedCardProgress.TimeCostModifiers",
+                    DefaultText = "Time Cost Modifiers"
+                }, ""));
+                foreach (var effect in status.EffectsOnActions)
+                {
+                    if (effect.DurationModifier == 0) continue;
+                    texts.Add(FormatActionDurationModifiers(effect, 2));
+                }
+            }
+        }
+
         if (stat.StatModel.UsesNovelty && stat.StalenessValues.Count > 0)
         {
             List<string> stalenessText = new();
