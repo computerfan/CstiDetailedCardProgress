@@ -110,7 +110,6 @@ jobs:
       run: |
         $sourceFiles = @(
             ".\$env:outputPath\CstiDetailedCardProgress.dll",
-            ".\README.md",
             ".\LICENSE"
         )
         New-Item -ItemType Directory -Force -Path .\artifact
