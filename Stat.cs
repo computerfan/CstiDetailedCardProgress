@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using UnityEngine;
 using static CstiDetailedCardProgress.Utils;
@@ -19,6 +20,27 @@ internal class Stat
         else
             //Reset the tool tip to the base game settings.
             __instance.SetTooltip(__instance.ModelStatus.GameName, __instance.ModelStatus.Description, "");
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AffectedStatInfo), "Setup")]
+    public static void PatchAffectedStatInfoInteractable(AffectedStatInfo __instance, GameStat _Stat)
+    {
+        if (Plugin.ForceInspectStatInfos)
+        {
+            _Stat.CannotBeInspected = false;
+            __instance.InteractionButton.interactable = true;
+        }
+    }
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(StatInfluenceInfo), "SetupStatSource")]
+    public static void PatchStatInfluenceInfoInteractable(StatInfluenceInfo __instance, InGameStat _Stat)
+    {
+        if (Plugin.ForceInspectStatInfos)
+        {
+            _Stat.StatModel.CannotBeInspected = false;
+            __instance.InteractionButton.interactable = true;
+        }
     }
 
     public static string FormatInGameStat(InGameStat stat)
@@ -55,10 +77,29 @@ internal class Stat
         texts.Add(FormatRate(stat.SimpleRatePerTick, stat.SimpleCurrentValue, stat.StatModel.MinMaxValue.y,
             stat.StatModel.MinMaxValue.x));
         if (rateModsTexts.Count > 0) texts.Add(rateModsTexts.Join(delimiter: "\n"));
+
+        if (stat.CurrentStatuses != null && stat.CurrentStatuses.Count > 0)
+        {
+            foreach (var status in stat.CurrentStatuses)
+            {
+                if (status == null || status.EffectsOnActions == null) continue;
+                texts.Add(FormatBasicEntry(new LocalizedString()
+                {
+                    LocalizationKey = "CstiDetailedCardProgress.TimeCostModifiers",
+                    DefaultText = "Time Cost Modifiers"
+                }, ""));
+                foreach (var effect in status.EffectsOnActions)
+                {
+                    if (effect.DurationModifier == 0) continue;
+                    texts.Add(FormatActionDurationModifiers(effect, 2));
+                }
+            }
+        }
+
         if (stat.StatModel.UsesNovelty && stat.StalenessValues.Count > 0)
         {
             List<string> stalenessText = new();
-            foreach(var staleness in stat.StalenessValues)
+            foreach (var staleness in stat.StalenessValues)
             {
                 if (staleness.Quantity > -1 && stat.StatModel.StalenessMultiplier != 0)
                     stalenessText.Add(FormatBasicEntry(
