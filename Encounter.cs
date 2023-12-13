@@ -69,6 +69,7 @@ internal class Encounter
     [HarmonyPatch(typeof(EncounterPopup), "GenerateEnemyWound")]
     public static void PostGenerateEnemyWoundPatch(EncounterPopup __instance)
     {
+        if (!Plugin.Enabled || !Plugin.AdditionalEncounterLogMessage) return;
         static string SeverityText(WoundSeverity s)
         {
             return s switch
