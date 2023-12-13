@@ -9,6 +9,13 @@ namespace CstiDetailedCardProgress;
 
 public static class Utils
 {
+    public static string LcStr(string key, string defaultText = null)
+    {
+        if (LocalizationManager.CurrentTexts != null && LocalizationManager.CurrentTexts.TryGetValue(key, out string value))
+            return value;
+        return defaultText ?? key;
+    }
+
 #if MELON_LOADER
 public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, WoundSeverity _WoundSeverity, List<PlayerWound> _List)
   {
@@ -63,18 +70,15 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
 
         InGameEncounter encounter = popup.CurrentEncounter;
 
-        StringBuilder summary = new($"<size=85%><color=yellow>行动预览 {encounter.EnemyName}</color></size>\n");
-        summary.AppendLine($"玩家行动: {action.ActionName}");
+        StringBuilder summary = new($"<size=85%><color=yellow>{LcStr("CstiDetailedCardProgress.Encounter.ActionPreview", "Action Preview")} {encounter.EnemyName}</color></size>\n");
+        summary.AppendLine($"{LcStr("CstiDetailedCardProgress.Encounter.PlayerAction", "Player Action")}: {action.ActionName}");
         if (action.ActionRange == ActionRange.Melee)
         {
             float playerSuccess = currentRoundMeleeClashResult.PlayerPercentChance;
             float enemySuccess = currentRoundMeleeClashResult.EnemyPercentChance;
-            summary.AppendLine(
-                $" 战力比: {currentRoundMeleeClashResult.CommonClashReport.PlayerClashValue:0.#} : {currentRoundMeleeClashResult.CommonClashReport.EnemyClashValue:0.#}");
-            summary.AppendLine(
-                $" 玩家攻击击中率: {playerSuccess * 100f:0.##}%{(commonClashResult.PlayerCannotFail ? " <color=green>(必定命中)</color>" : "")}");
-            summary.AppendLine(
-                $" 敌人攻击命中率: {enemySuccess * 100f:0.##}%{(commonClashResult.EnemyCannotFail ? " <color=red>(必定命中)</color>" : "")}");
+            summary.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.PowerComparison", "Power Comparison")}: {currentRoundMeleeClashResult.CommonClashReport.PlayerClashValue:0.#} : {currentRoundMeleeClashResult.CommonClashReport.EnemyClashValue:0.#}");
+            summary.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.PlayerAttackHitRate", "Player Attack Hit Rate")}: {playerSuccess * 100f:0.##}%{(commonClashResult.PlayerCannotFail ? $" <color=green>({LcStr("CstiDetailedCardProgress.Encounter.GuaranteedHit", "Guaranteed Hit")})</color>" : "")}");
+            summary.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.EnemyAttackHitRate", "Enemy Attack Hit Rate")}: {enemySuccess * 100f:0.##}%{(commonClashResult.EnemyCannotFail ? $" <color=red>({LcStr("CstiDetailedCardProgress.Encounter.GuaranteedHit", "Guaranteed Hit")})</color>" : "")}");
             if (action.AssociatedCard)
                 foreach (PlayerEncounterVariable stat in action.AssociatedCard.CardModel.WeaponClashStatInfluences)
                     summary.AppendLine($"  {stat.Stat.GameName.ToString()}: {FormatMinMaxValue(stat.GenerateRandomRange())}");
@@ -84,79 +88,79 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
                 Vector2 damageStatSum = action.DamageStatSum;
                 Vector2 sizeDamage = new(popup.PlayerSize, popup.PlayerSize);
 
-                summary.AppendLine($" 伤害力: {FormatMinMaxValue(damage)}");
-                summary.AppendLine($" 状态伤害加成: {FormatMinMaxValue(damageStatSum)}");
+                summary.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.DamagePower", "Damage Power")}: {FormatMinMaxValue(damage)}");
+                summary.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.StatusDamageBonus", "Status Damage Bonus")}: {FormatMinMaxValue(damageStatSum)}");
                 if (action.AssociatedCard)
                     foreach (PlayerEncounterVariable stat in action.AssociatedCard.CardModel.WeaponDamageStatInfluences)
                         summary.AppendLine($"  {stat.Stat.GameName.ToString()}: {FormatMinMaxValue(stat.GenerateRandomRange())}");
-                summary.AppendLine($" 近战体型伤害加成: {ColorFloat(popup.PlayerSize)}");
-                summary.AppendLine($" 伤害类型: {action.DamageTypes.Select(t => t.Name.ToString()).Join()}");
+                summary.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.MeleeSizeDamageBonus", "Melee Size Damage Bonus")}: {ColorFloat(popup.PlayerSize)}");
+                summary.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.DamageType", "Damage Type")}: {action.DamageTypes.Select(t => t.Name.ToString()).Join()}");
                 EncounterPlayerDamageReport damageReport = new()
                 {
                     SizeDefense = encounter.CurrentEnemySize
                 };
 
-                summary.AppendLine(" 可命中部位:")
+                summary.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.HitableParts", "Hitable Parts")}:")
                     .AppendLine(
                         $"{FormatPlayerHitResult(encounter, action, popup, damage + damageStatSum + sizeDamage)}");
             }
 
-            summary.AppendLine($" 距离变化: {GetDistanceChangeText(action.DistanceChange)}");
+            summary.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.DistanceChange", "Distance Change")}: {GetDistanceChangeText(action.DistanceChange)}");
         }
         else if (action.ActionRange == ActionRange.Ranged)
         {
             if (encounter.Distant)
             {
                 summary.AppendLine(
-                    $" 战力比: {currentRoundRangedClashResult.PlayerClashValue:0.#} : {currentRoundRangedClashResult.EnemyClashValue:0.#}");
+                    $" {LcStr("CstiDetailedCardProgress.Encounter.PowerComparison", "Power Comparison")}: {currentRoundRangedClashResult.PlayerClashValue:0.#} : {currentRoundRangedClashResult.EnemyClashValue:0.#}");
 
                 float playerSuccess = currentRoundRangedClashResult.PlayerSuccessChance;
                 float enemySuccess = currentRoundRangedClashResult.EnemySuccessChance;
-                // Debug.Log($"不精确度: {action.ClashInaccuracy}");
-                summary.AppendLine($"玩家命中率: {playerSuccess * 100f:0.##}%");
-                summary.AppendLine($"敌人命中率: {enemySuccess * 100f:0.##}%");
+                // Debug.Log($"Inaccuracy: {action.ClashInaccuracy}");
+                summary.AppendLine($"{LcStr("CstiDetailedCardProgress.Encounter.PlayerHitRate", "Player Hit Rate")}: {playerSuccess * 100f:0.##}%");
+                summary.AppendLine($"{LcStr("CstiDetailedCardProgress.Encounter.EnemyHitRate", "Enemy Hit Rate")}: {enemySuccess * 100f:0.##}%");
             }
             else
             {
                 summary.AppendLine(
-                    $" 战力比: {currentRoundMeleeClashResult.CommonClashReport.PlayerClashValue:0.#} : {currentRoundMeleeClashResult.CommonClashReport.EnemyClashValue:0.#}");
+                    $" {LcStr("CstiDetailedCardProgress.Encounter.PowerComparison", "Power Comparison")}: {currentRoundMeleeClashResult.CommonClashReport.PlayerClashValue:0.#} : {currentRoundMeleeClashResult.CommonClashReport.EnemyClashValue:0.#}");
 
                 float playerSuccess = currentRoundMeleeClashResult.PlayerPercentChance;
                 float enemySuccess = currentRoundMeleeClashResult.EnemyPercentChance;
 
-                summary.AppendLine($"玩家命中率: {playerSuccess * 100f:0.##}%");
-                summary.AppendLine($"敌人命中率: {enemySuccess * 100f:0.##}%");
+                summary.AppendLine($"{LcStr("CstiDetailedCardProgress.Encounter.PlayerHitRate", "Player Hit Rate")}: {playerSuccess * 100f:0.##}%");
+                summary.AppendLine($"{LcStr("CstiDetailedCardProgress.Encounter.EnemyHitRate", "Enemy Hit Rate")}: {enemySuccess * 100f:0.##}%");
             }
 
             Vector2 damage = action.Damage;
             Vector2 damageStatSum = action.DamageStatSum;
             if (!action.DoesNotAttack)
             {
-                summary.AppendLine($" 基础伤害力: {FormatMinMaxValue(damage)}");
-                summary.AppendLine($" 状态伤害加成: {FormatMinMaxValue(damageStatSum)}");
+                summary.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.BasicDamagePower", "Basic Damage Power")}: {FormatMinMaxValue(damage)}");
+                summary.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.StatusDamageBonus", "Status Damage Bonus")}: {FormatMinMaxValue(damageStatSum)}");
                 if (action.AssociatedCard)
                     foreach (PlayerEncounterVariable stat in action.AssociatedCard.CardModel.WeaponDamageStatInfluences)
                         summary.AppendLine($"  {stat.Stat.GameName.ToString()}: {FormatMinMaxValue(stat.GenerateRandomRange())}");
                 if (action.AmmoCard)
                     foreach (PlayerEncounterVariable stat in action.AmmoCard.CardModel.WeaponDamageStatInfluences)
                         summary.AppendLine($"  {stat.Stat.GameName.ToString()}: {FormatMinMaxValue(stat.GenerateRandomRange())}");
-                summary.AppendLine($" 伤害类型: {action.DamageTypes.Select(t => t.Name.ToString()).Join()}");
-                summary.AppendLine(" 可命中部位:")
+                summary.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.DamageTypes", "Damage Types")}: {action.DamageTypes.Select(t => t.Name.ToString()).Join()}");
+                summary.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.HitableParts", "Hitable Parts")}:")
                     .AppendLine($"{FormatPlayerHitResult(encounter, action, popup, damage + damageStatSum)}");
             }
 
-            summary.AppendLine($" 距离变化: {GetDistanceChangeText(action.DistanceChange)}");
+            summary.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.DistanceChange", "Distance Change")}: {GetDistanceChangeText(action.DistanceChange)}");
         }
 
-        summary.AppendLine("当前敌人状态:")
-            .AppendLine($" 血量: {encounter.CurrentEnemyBlood}")
-            .AppendLine($" 勇气: {encounter.CurrentEnemyMorale}")
-            .AppendLine($" 耐力: {encounter.CurrentEnemyStamina}")
-            .AppendLine($" 近战技能: {encounter.CurrentEnemyMeleeSkill}")
-            .AppendLine($" 远程技能: {encounter.CurrentEnemyRangedSkill}")
-            .AppendLine($" 潜行: {encounter.CurrentEnemyStealth}");
+        summary.AppendLine($"{LcStr("CstiDetailedCardProgress.Encounter.CurrentEnemyStatus", "Current Enemy Status")}:")
+            .AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.Health", "Health")}: {encounter.CurrentEnemyBlood}")
+            .AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.Courage", "Courage")}: {encounter.CurrentEnemyMorale}")
+            .AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.Stamina", "Stamina")}: {encounter.CurrentEnemyStamina}")
+            .AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.MeleeSkill", "Melee Skill")}: {encounter.CurrentEnemyMeleeSkill}")
+            .AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.RangedSkill", "Ranged Skill")}: {encounter.CurrentEnemyRangedSkill}")
+            .AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.Stealth", "Stealth")}: {encounter.CurrentEnemyStealth}");
 
-        summary.AppendLine($"战力详细数据:\n{FormatPlayerClashValue(encounter, action, popup)}");
+        summary.AppendLine($"{LcStr("CstiDetailedCardProgress.Encounter.PowerDetailedData", "Power Detailed Data")}:\n{FormatPlayerClashValue(encounter, action, popup)}");
         return summary.ToString();
     }
 
@@ -211,9 +215,9 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
     {
         return distanceChange switch
         {
-            EncounterDistanceChange.DontChangeDistance => "不变",
-            EncounterDistanceChange.AddDistance => "远离",
-            EncounterDistanceChange.CloseDistance => "靠近",
+            EncounterDistanceChange.DontChangeDistance => $"{LcStr("CstiDetailedCardProgress.Encounter.NoChange", "No Change")}",
+            EncounterDistanceChange.AddDistance => $"{LcStr("CstiDetailedCardProgress.Encounter.IncreaseDistance", "Increase Distance")}",
+            EncounterDistanceChange.CloseDistance => $"{LcStr("CstiDetailedCardProgress.Encounter.DecreaseDistance", "Decrease Distance")}",
             _ => ""
         };
     }
@@ -321,7 +325,7 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
             if (resultReport.GetBodyLocationHitWeight(bodyPart) > 0)
             {
                 LocalizedString bodyPartName = new()
-                { LocalizationKey = $"CstiDetailedCardProgress.BodyParts.{bodyPart}" };
+                { LocalizationKey = $"CstiDetailedCardProgress.BodyParts.{bodyPart}", DefaultText = bodyPart.ToString()};
                 List<(Vector2, WoundSeverity)> mapping = woundMappings[(int)bodyPart];
                 IEnumerable<(WoundSeverity, float)> woundsProbs = from m in mapping
                                                                   where VectorMath.RangeIntersect(playerActionDamage, m.Item1).RangeLength() > 0
@@ -342,12 +346,12 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
                 }
 
                 result.AppendLine(
-                    $"{spaces}{bodyPartName.ToString()}: {resultReport.GetBodyLocationHitWeight(bodyPart) / resultReport.TotalWeight * 100f:0}% (总防御: {enemyDefenses[(int)bodyPart]:0})");
+                    $"{spaces}{bodyPartName.ToString()}: {resultReport.GetBodyLocationHitWeight(bodyPart) / resultReport.TotalWeight * 100f:0}% ({LcStr("CstiDetailedCardProgress.Encounter.TotalDefense", "Total Defense")}: {enemyDefenses[(int)bodyPart]:0})");
                 result.AppendLine(
                     $"{spaces}| {string.Join(" | ", mapping.Select(m => $"{VectorMath.RangeIntersect(playerActionDamage, m.Item1).RangeLength() / playerActionDamage.RangeLength() * 100f:0}%"))} |");
             }
 
-        result.AppendLine($" 本次攻击致命概率:{deadlyProb * 100f:0.##}%");
+        result.AppendLine($" {LcStr("CstiDetailedCardProgress.Encounter.LethalityProbabilityOfThisAttack", "Lethality Probability of This Attack")}:{deadlyProb * 100f:0.##}%");
         // 输出结果
         return result.ToString();
     }
@@ -368,18 +372,18 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
         };
         bool ranged = encounter.Distant;
         // Debug.Log(action.GetClash(true));
-        result.AppendLine($"{spaces}基础值: {report.PlayerActionClashValue:0}")
-            .AppendLine(
-                $"{spaces}体型加成: {(action.ActionRange == ActionRange.Ranged ? 0.0f : report.PlayerSizeClashValue):0}")
-            .AppendLine($"{spaces}武器长度加成: {report.PlayerActionReachClashValue}");
+        result.AppendLine($"{spaces}{LcStr("CstiDetailedCardProgress.Encounter.BaseValue", "Base Value")}: {report.PlayerActionClashValue:0}")
+    .AppendLine(
+        $"{spaces}{LcStr("CstiDetailedCardProgress.Encounter.SizeBonus", "Size Bonus")}: {(action.ActionRange == ActionRange.Ranged ? 0.0f : report.PlayerSizeClashValue):0}")
+    .AppendLine($"{spaces}{LcStr("CstiDetailedCardProgress.Encounter.WeaponLengthBonus", "Weapon Length Bonus")}: {report.PlayerActionReachClashValue}");
         if (report.PlayerClashStatsAddedValues != null && report.PlayerClashStatsAddedValues.Count > 0)
             result.AppendLine(
-                $"{spaces}状态加成:\n{string.Join("\n", report.PlayerClashStatsAddedValues.ToArray().Select(v => $"{spaces} {v.Stat.GameName.ToString()}: {ColorFloat(v.Value)}"))}");
+                $"{spaces}{LcStr("CstiDetailedCardProgress.Encounter.StatusBonus", "Status Bonus")}:\n{string.Join("\n", report.PlayerClashStatsAddedValues.ToArray().Select(v => $"{spaces} {v.Stat.GameName.ToString()}: {ColorFloat(v.Value)}"))}");
         if (encounter.PlayerHidden)
         {
             report.PlayerClashStealthBonus = action.GetClashStealthBonus(_WithRandomness);
             // Debug.Log(action.GetClashStealthBonus(true));
-            result.AppendLine($"{spaces}潜行加成: <color=green>{report.PlayerClashStealthBonus:0}</color>");
+            result.AppendLine($"{spaces}{LcStr("CstiDetailedCardProgress.Encounter.StealthBonus", "Stealth Bonus")}: <color=green>{report.PlayerClashStealthBonus:0}</color>");
         }
 
         if ((!ranged && action.ActionRange == ActionRange.Ranged) ||
@@ -387,14 +391,14 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
         {
             report.PlayerClashIneffectiveRangeMalus = action.GetClashIneffectiveRangeMalus(_WithRandomness);
             // Debug.Log(action.GetClashIneffectiveRangeMalus(true));
-            result.AppendLine($"{spaces}无效范围减成: <color=red>{report.PlayerClashIneffectiveRangeMalus:0}</color>");
+            result.AppendLine($"{spaces}{LcStr("CstiDetailedCardProgress.Encounter.IneffectiveRangeMalus", "Ineffective Range Malus")}: <color=red>{report.PlayerClashIneffectiveRangeMalus:0}</color>");
         }
 
         if (action.ActionRange == ActionRange.Ranged)
         {
-            result.AppendLine($"{spaces}敌人体型减成: {ColorFloat(-encounter.CurrentEnemySize)}");
-            result.AppendLine($"{spaces}不精确度减成: {ColorFloat(-action.ClashInaccuracy.y)}");
-            result.AppendLine($"{spaces}敌人掩体减成: {ColorFloat(-encounter.CurrentEnemyCover)}");
+            result.AppendLine($"{spaces}{LcStr("CstiDetailedCardProgress.Encounter.EnemySizeMalus", "Enemy Size Malus")}: {ColorFloat(-encounter.CurrentEnemySize)}");
+            result.AppendLine($"{spaces}{LcStr("CstiDetailedCardProgress.Encounter.InaccuracyMalus", "Inaccuracy Malus")}: {ColorFloat(-action.ClashInaccuracy.y)}");
+            result.AppendLine($"{spaces}{LcStr("CstiDetailedCardProgress.Encounter.EnemyCoverMalus", "Enemy Cover Malus")}: {ColorFloat(-encounter.CurrentEnemyCover)}");
         }
 
         return result.ToString();
@@ -554,7 +558,7 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
             if (wounds[0].DroppedCards.Length == 0) return "";
             if (playerBodyLocationHit.GetBodyLocationHitWeight(bodyPart) > 0)
                 result.AppendLine(
-                    $"{new string(' ', indent)}{new LocalizedString { LocalizationKey = $"CstiDetailedCardProgress.BodyParts.{bodyPart}" }.ToString()}({playerBodyLocationHit.GetBodyLocationHitWeight(bodyPart) / playerBodyLocationHit.TotalWeight * 100f:0.#}%): {wounds.Select(w => w.DroppedCards[0].CardName.ToString()).Join()} (攻防比: {currentRoundEnemyDamageReport.EnemyDamage}:{currentRoundEnemyDamageReport.PlayerDefense})");
+                    $"{new string(' ', indent)}{new LocalizedString { LocalizationKey = $"CstiDetailedCardProgress.BodyParts.{bodyPart}", DefaultText = bodyPart.ToString()}.ToString()}({playerBodyLocationHit.GetBodyLocationHitWeight(bodyPart) / playerBodyLocationHit.TotalWeight * 100f:0.#}%): {wounds.Select(w => w.DroppedCards[0].CardName.ToString()).Join()} ({LcStr("CstiDetailedCardProgress.Encounter.AttackDefenseRatio", "Attack-Defense Ratio")}: {currentRoundEnemyDamageReport.EnemyDamage}:{currentRoundEnemyDamageReport.PlayerDefense})");
         }
 
         return result.ToString();

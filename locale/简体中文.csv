@@ -61,3 +61,48 @@ CstiDetailedCardProgress.BodyParts.LLeg,Left Leg,左腿
 CstiDetailedCardProgress.BodyParts.RLeg,Right Leg,右腿
 CstiDetailedCardProgress.Encounter.PossibleWoundsHint,If I am hit by an enemy, I might get hurt: (on average),如果我被敌人击中，我可能会受伤:（平均情况下）
 CstiDetailedCardProgress.Encounter.ImpossibleWoundsHint,I am confident it can't hurt me! (on average),我自信它伤不到我！（平均情况下）
+CstiDetailedCardProgress.Encounter.ActionPreview,Action Preview,行动预览
+CstiDetailedCardProgress.Encounter.PlayerAction,Player Action,玩家行动
+CstiDetailedCardProgress.Encounter.PowerComparison,Power Comparison,战力比
+CstiDetailedCardProgress.Encounter.PlayerAttackHitRate,Player Attack Hit Rate,玩家攻击击中率
+CstiDetailedCardProgress.Encounter.EnemyAttackHitRate,Enemy Attack Hit Rate,敌人攻击命中率
+CstiDetailedCardProgress.Encounter.GuaranteedHit,Guaranteed Hit,必定命中
+CstiDetailedCardProgress.Encounter.DamagePower,Damage Power,伤害力
+CstiDetailedCardProgress.Encounter.StatusDamageBonus,Status Damage Bonus,状态伤害加成
+CstiDetailedCardProgress.Encounter.MeleeSizeDamageBonus,Melee Size Damage Bonus,近战体型伤害加成
+CstiDetailedCardProgress.Encounter.DamageType,Damage Type,伤害类型
+CstiDetailedCardProgress.Encounter.HitableParts,Hit-able Parts,可命中部位
+CstiDetailedCardProgress.Encounter.DistanceChange,Distance Change,距离变化
+CstiDetailedCardProgress.Encounter.CurrentEnemyStatus,Current Enemy Status,当前敌人状态
+CstiDetailedCardProgress.Encounter.Health,Health,血量
+CstiDetailedCardProgress.Encounter.Courage,Courage,勇气
+CstiDetailedCardProgress.Encounter.Stamina,Stamina,耐力
+CstiDetailedCardProgress.Encounter.MeleeSkill,Melee Skill,近战技能
+CstiDetailedCardProgress.Encounter.RangedSkill,Ranged Skill,远程技能
+CstiDetailedCardProgress.Encounter.Stealth,Stealth,潜行
+CstiDetailedCardProgress.Encounter.PowerDetailedData,Power Details,战力详细数据
+CstiDetailedCardProgress.Encounter.Unchanged,Unchanged,不变
+CstiDetailedCardProgress.Encounter.MoveAway,Move Away,远离
+CstiDetailedCardProgress.Encounter.MoveCloser,Move Closer,靠近
+CstiDetailedCardProgress.Encounter.TotalDefense,Total Defense,总防御
+CstiDetailedCardProgress.Encounter.LethalityProbabilityOfThisAttack,Fatality Probability,本次攻击致命概率
+CstiDetailedCardProgress.Encounter.BaseValue,Base Value,基础值
+CstiDetailedCardProgress.Encounter.SizeBonus,Size Bonus,体型加成
+CstiDetailedCardProgress.Encounter.WeaponLengthBonus,Weapon Length Bonus,武器长度加成
+CstiDetailedCardProgress.Encounter.StatusBonus,Status Bonus,状态加成
+CstiDetailedCardProgress.Encounter.StealthBonus,Stealth Bonus,潜行加成
+CstiDetailedCardProgress.Encounter.IneffectiveRangeMalus,Ineffective Range Malus,无效范围减成
+CstiDetailedCardProgress.Encounter.EnemySizeMalus,Enemy Size Malus,敌人体型减成
+CstiDetailedCardProgress.Encounter.InaccuracyMalus,Inaccuracy Malus,不精确度减成
+CstiDetailedCardProgress.Encounter.EnemyCoverMalus,Enemy Cover Malus,敌人掩体减成
+CstiDetailedCardProgress.Encounter.AttackDefenseRatio,Attack-Defense Ratio,攻防比
+CstiDetailedCardProgress.Encounter.PlayerHitRate,Player Hit Rate,玩家命中率
+CstiDetailedCardProgress.Encounter.BasicDamagePower,Basic Damage Power,基础伤害力
+CstiDetailedCardProgress.Encounter.NoChange,No Change,不变
+CstiDetailedCardProgress.Encounter.IncreaseDistance,Increase Distance,远离
+CstiDetailedCardProgress.Encounter.DecreaseDistance,Decrease Distance,靠近
+CstiDetailedCardProgress.Encounter.DamageThisRound,This Round's Damage,本轮伤害
+CstiDetailedCardProgress.Encounter.Minor,Minor,轻微
+CstiDetailedCardProgress.Encounter.Medium,Medium,中等
+CstiDetailedCardProgress.Encounter.Serious,Serious,沉重
+CstiDetailedCardProgress.Encounter.AttackDefenseRatio,Attack-Defense Ratio,攻防比

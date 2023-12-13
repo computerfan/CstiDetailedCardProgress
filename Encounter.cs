@@ -73,9 +73,9 @@ internal class Encounter
         {
             return s switch
             {
-                WoundSeverity.Minor => "本轮伤害: 轻微",
-                WoundSeverity.Medium => "本轮伤害: 中等",
-                WoundSeverity.Serious => "本轮伤害: 沉重",
+                WoundSeverity.Minor => $"{LcStr("CstiDetailedCardProgress.Encounter.DamageThisRound", "This Round's Damage")}: {LcStr("CstiDetailedCardProgress.Encounter.Minor", "Minor")}",
+                WoundSeverity.Medium => $"{LcStr("CstiDetailedCardProgress.Encounter.DamageThisRound", "This Round's Damage")}: {LcStr("CstiDetailedCardProgress.Encounter.Medium", "Medium")}",
+                WoundSeverity.Serious => $"{LcStr("CstiDetailedCardProgress.Encounter.DamageThisRound", "This Round's Damage")}: {LcStr("CstiDetailedCardProgress.Encounter.Serious", "Serious")}",
                 _ => ""
             };
         }
