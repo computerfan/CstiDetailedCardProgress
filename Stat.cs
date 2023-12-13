@@ -26,21 +26,17 @@ internal class Stat
     [HarmonyPatch(typeof(AffectedStatInfo), "Setup")]
     public static void PatchAffectedStatInfoInteractable(AffectedStatInfo __instance, GameStat _Stat)
     {
-        if (Plugin.ForceInspectStatInfos)
-        {
-            _Stat.CannotBeInspected = false;
-            __instance.InteractionButton.interactable = true;
-        }
+        if (!Plugin.Enabled || !Plugin.ForceInspectStatInfos) return;
+        _Stat.CannotBeInspected = false;
+        __instance.InteractionButton.interactable = true;
     }
     [HarmonyPostfix]
     [HarmonyPatch(typeof(StatInfluenceInfo), "SetupStatSource")]
     public static void PatchStatInfluenceInfoInteractable(StatInfluenceInfo __instance, InGameStat _Stat)
     {
-        if (Plugin.ForceInspectStatInfos)
-        {
-            _Stat.StatModel.CannotBeInspected = false;
-            __instance.InteractionButton.interactable = true;
-        }
+        if (!Plugin.Enabled || !Plugin.ForceInspectStatInfos) return;
+        _Stat.StatModel.CannotBeInspected = false;
+        __instance.InteractionButton.interactable = true;
     }
 
     public static string FormatInGameStat(InGameStat stat)
