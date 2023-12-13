@@ -57,6 +57,7 @@ namespace CstiDetailedCardProgress
         private MelonPreferences_Entry<bool> RecipesShowTargetDurationEntry;
         private MelonPreferences_Entry<bool> HideImpossibleDropSetEntry;
         private MelonPreferences_Entry<bool> AdditionalEncounterLogMessageEntry;
+        private MelonPreferences_Entry<bool> ForceInspectStatInfosEntry;
         public override void OnInitializeMelon()
         {
             GeneralPreferencesCategory = MelonPreferences.CreateCategory("General");
@@ -76,12 +77,15 @@ namespace CstiDetailedCardProgress
             AdditionalEncounterLogMessageEntry = TweakPreferencesCategory.CreateEntry(
                 nameof(AdditionalEncounterLogMessage), false,
                 "If true, shows additional tips in the message log of combat encounter.");
+            ForceInspectStatInfosEntry = GeneralPreferencesCategory.CreateEntry(nameof(ForceInspectStatInfosEntry),
+                false, "If true, stats like Bacteria Fever are forced to be inspectable.");
             Enabled = EnabledEntry.Value; 
             HotKey = HotKeyEntry.Value;
             WeatherCardInspectable = WeatherCardInspectableEntry.Value;
             RecipesShowTargetDuration = RecipesShowTargetDurationEntry.Value;
             HideImpossibleDropSet = HideImpossibleDropSetEntry.Value;
             AdditionalEncounterLogMessage = AdditionalEncounterLogMessageEntry.Value;
+            ForceInspectStatInfos = ForceInspectStatInfosEntry.Value;
 
             HarmonyLib.Harmony.CreateAndPatchAll(typeof(Plugin));
             HarmonyLib.Harmony.CreateAndPatchAll(typeof(Stat));
