@@ -79,3 +79,11 @@ __Toggle Note__: When using the hotkey to enable/disable the detailed tooltips, 
 - Resolved tooltip title overlap issue.
 - New config entry "WeatherCardInspectable". Enabled by default to inspect weather card.
 - Shows OnFull/Zero action details when card stats change.
+
+## 1.1.4
+- Show tooltip in the combat encounter (by @DreamPrism).
+- New config entry ForceInspectStatInfos (by @DreamPrism).
+- New config entry AdditionalEncounterLogMessage.
+- Fix ignored possible same weather.
+- Shows actions of liquid containers.
+- Minor bug fix.
