@@ -863,16 +863,20 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
         return $"{new string(' ', indent)}<color=\"yellow\">{current:0.##}/{max:0.##}</color> {name}";
     }
 
-    public static string FormatWeaponStats(Vector2 clash, Vector2 damage, float reach)
+    public static string FormatWeaponStats(Vector2 clash, Vector2 damage, float reach, int indent = 0)
     {
-        LocalizedString title = new() { LocalizationKey = "CstiDetailedCardProgress.WeaponStats" };
-        LocalizedString clashTitle = new() { LocalizationKey = "CstiDetailedCardProgress.WeaponStats.Clash" };
-        LocalizedString damageTitle = new() { LocalizationKey = "CstiDetailedCardProgress.WeaponStats.Damage" };
-        LocalizedString reachTitle = new() { LocalizationKey = "CstiDetailedCardProgress.WeaponStats.Reach" };
-        return $"{title}\n" +
-               $"  <size=75%>{clashTitle}: {FormatMinMaxValue(clash)}\n" +
-               $"  {damageTitle}: {FormatMinMaxValue(damage)}\n" +
-               $"  {reachTitle}: {reach:0.#}</size>";
+        LocalizedString title = new()
+            { LocalizationKey = "CstiDetailedCardProgress.WeaponStats", DefaultText = "Weapon Stats" };
+        LocalizedString clashTitle = new()
+            { LocalizationKey = "CstiDetailedCardProgress.WeaponStats.Clash", DefaultText = "Clash" };
+        LocalizedString damageTitle = new()
+            { LocalizationKey = "CstiDetailedCardProgress.WeaponStats.Damage", DefaultText = "Damage" };
+        LocalizedString reachTitle = new()
+            { LocalizationKey = "CstiDetailedCardProgress.WeaponStats.Reach", DefaultText = "Reach" };
+        return $"{FormatBasicEntry(title, "", indent: indent)}\n" +
+               $"  <size=75%>{FormatBasicEntry(FormatMinMaxValue(clash),clashTitle, indent: indent + 2)}\n" +
+               $"  {FormatBasicEntry(FormatMinMaxValue(damage),damageTitle, indent: indent + 2)}\n" +
+               $"  {FormatBasicEntry(ColorFloat(reach), reachTitle, indent: indent + 2)}</size>";
     }
 
     public static string TimeSpanFormat(TimeSpan ts)
