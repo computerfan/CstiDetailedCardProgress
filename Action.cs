@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
+using UnityEngine;
 using static CstiDetailedCardProgress.Utils;
 
 namespace CstiDetailedCardProgress;
@@ -193,10 +194,13 @@ internal class Action
                         texts.Add(FormatTooltipEntry(statmod.BonusWeight, $"{statmod.Stat.GameName}", 4 + indent));
                 };
             if (withCard && report.DropsInfo[i].CardWeightMods != null)
-                foreach (var cardmod in report.DropsInfo[i].CardWeightMods)
+                foreach (CardDropWeightModReport cardmod in report.DropsInfo[i].CardWeightMods)
                 {
-                    if (cardmod.BonusWeight != 0)
-                        texts.Add(FormatTooltipEntry(cardmod.BonusWeight, $"{cardmod.Card.CardModel.CardName.ToString()}",
+                    if (!Mathf.Approximately(cardmod.BonusWeight, 0))
+                        texts.Add(FormatTooltipEntry(cardmod.BonusWeight,
+                            cardmod.Card && cardmod.Card.CardModel
+                                ? cardmod.Card.CardModel.CardName.ToString()
+                                : "Unknown card (possibly environment)",
                             4 + indent));
                 };
             if (withDuability)
