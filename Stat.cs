@@ -78,7 +78,7 @@ internal class Stat
         {
             foreach (var status in stat.CurrentStatuses)
             {
-                if (status == null || status.EffectsOnActions == null) continue;
+                if (status?.EffectsOnActions == null || status.EffectsOnActions.Length == 0) continue;
                 texts.Add(FormatBasicEntry(new LocalizedString()
                 {
                     LocalizationKey = "CstiDetailedCardProgress.TimeCostModifiers",
