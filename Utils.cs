@@ -873,10 +873,60 @@ public static void GetWoundsForSeverity_il2cpp(this PlayerWounds playerWounds, W
             { LocalizationKey = "CstiDetailedCardProgress.WeaponStats.Damage", DefaultText = "Damage" };
         LocalizedString reachTitle = new()
             { LocalizationKey = "CstiDetailedCardProgress.WeaponStats.Reach", DefaultText = "Reach" };
+
         return $"{FormatBasicEntry(title, "", indent: indent)}\n" +
-               $"  <size=75%>{FormatBasicEntry(FormatMinMaxValue(clash),clashTitle, indent: indent + 2)}\n" +
-               $"  {FormatBasicEntry(FormatMinMaxValue(damage),damageTitle, indent: indent + 2)}\n" +
-               $"  {FormatBasicEntry(ColorFloat(reach), reachTitle, indent: indent + 2)}</size>";
+               $"<size=75%>{FormatBasicEntry(FormatMinMaxValue(clash),clashTitle, indent: indent + 2)}\n" +
+               $"{FormatBasicEntry(FormatMinMaxValue(damage),damageTitle, indent: indent + 2)}\n" +
+               $"{FormatBasicEntry(ColorFloat(reach), reachTitle, indent: indent + 2)}" +
+               $"</size>";
+    }
+    public static string FormatWeaponStats(CardData card, int indent = 2)
+    {
+        List<string> texts = new();
+        if (card.IsWeapon)
+        {
+            texts.Add(FormatBasicEntry(FormatMinMaxValue(card.BaseClashValue),
+                LcStr("CstiDetailedCardProgress.WeaponStats.Clash", "Clash")));
+
+            texts.Add(FormatBasicEntry(FormatMinMaxValue(card.WeaponDamage),
+                LcStr("CstiDetailedCardProgress.WeaponStats.WeaponDamage", "Weapon Damage")));
+
+            texts.Add(FormatBasicEntry(ColorFloat(card.WeaponReach),
+                LcStr("CstiDetailedCardProgress.WeaponStats.WeaponReach", "Weapon Reach")));
+
+            texts.Add(FormatBasicEntry(FormatMinMaxValue(card.ClashIneffectiveRangeMalus),
+                LcStr("CstiDetailedCardProgress.WeaponStats.ClashIneffectiveRangeMalus", "Clash Ineffective Range Malus")));
+
+            texts.Add(FormatBasicEntry(FormatMinMaxValue(card.ClashVsEscapeBonus),
+                LcStr("CstiDetailedCardProgress.WeaponStats.ClashVsEscapeBonus", "Clash Vs Escape Bonus")));
+
+            texts.Add(FormatBasicEntry(FormatMinMaxValue(card.DmgVsEscapeBonus),
+                LcStr("CstiDetailedCardProgress.WeaponStats.DmgVsEscapeBonus", "Damage Vs Escape Bonus")));
+
+            texts.Add(FormatBasicEntry(FormatMinMaxValue(card.ClashStealthBonus),
+                LcStr("CstiDetailedCardProgress.WeaponStats.ClashStealthBonus", "Clash Stealth Bonus")));
+        }
+
+        if (card.IsCover)
+        {
+            texts.Add(FormatBasicEntry(ColorFloat(card.PlayerAddedCover),
+                LcStr("CstiDetailedCardProgress.ArmorStats.PlayerAddedCover", "Player Added Cover")));
+
+            texts.Add(FormatBasicEntry(ColorFloat(card.EnemyAddedCover),
+                LcStr("CstiDetailedCardProgress.ArmorStats.EnemyAddedCover", "Enemy Added Cover")));
+
+            texts.Add(FormatBasicEntry(ColorFloat(card.PlayerAddedStealth),
+                LcStr("CstiDetailedCardProgress.ArmorStats.PlayerAddedStealth", "Player Added Stealth")));
+
+            texts.Add(FormatBasicEntry(ColorFloat(card.EnemyAddedStealth),
+                LcStr("CstiDetailedCardProgress.ArmorStats.EnemyAddedStealth", "Enemy Added Stealth")));
+        }
+
+        LocalizedString title = new()
+            { LocalizationKey = "CstiDetailedCardProgress.WeaponStats", DefaultText = "Weapon Stats" };
+        
+        return $"{FormatBasicEntry(title, "", indent: indent)}\n" +
+               $"<size=75%>{texts.Join(delimiter:"\n")}</size>";
     }
 
     public static string TimeSpanFormat(TimeSpan ts)
