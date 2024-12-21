@@ -94,7 +94,7 @@ internal class Action
                     }));
             }
         }
-        else if (popup & popup.CurrentSet)
+        else if (popup && popup.CurrentSet)
         {
             actionSet = popup.CurrentSet;
             if (actionSet.name == "TimeSkipOptions" && __instance.Index > -1 && __instance.Index < actionSet.Actions.Length)
