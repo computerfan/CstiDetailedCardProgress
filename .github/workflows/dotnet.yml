@@ -65,7 +65,7 @@ jobs:
           Copy-Item -Path "$file" -Destination .\artifact
         }
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: CstiDetailedCardProgress-${{steps.get-version.outputs.version}}
         path: ./artifact/
@@ -118,7 +118,7 @@ jobs:
           Copy-Item -Path "$file" -Destination .\artifact
         }
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: CstiDetailedCardProgress_Android-${{steps.get-version.outputs.version}}
         path: ./artifact/
