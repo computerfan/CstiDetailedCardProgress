@@ -185,7 +185,11 @@ namespace CstiDetailedCardProgress
 
                 CardOnCardAction action = __instance.PossibleAction;
                 if (action == null) return;
-                InGameCardBase currentCard = __instance.ContainedLiquid ?? __instance;
+                InGameCardBase currentCard =
+                    action.CanGiveLiquid(droppedCard) &&
+                    action.RequiredGivenLiquidContent.IsValid(droppedCard, _InactiveMeansEmpty: false)
+                        ? __instance.ContainedLiquid
+                        : __instance;
                 if (action.ProducedCards != null)
                 {
                     CollectionDropReport dropReport = gm.GetCollectionDropsReport(action, currentCard, true);
